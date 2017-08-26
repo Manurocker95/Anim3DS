@@ -200,6 +200,8 @@ void GameScreen::Start()
 	// We initialize our game variables
 	m_offset = 0;
 	m_listOffset = 0;
+	int m_episodeSelected = 0;
+	int m_maxEpisodeSelected = 0;
 	menu_status = GameScreen::MENU_TYPE::MAIN;
 
 	// We load our images and place them into RAM so they can be painted
@@ -210,7 +212,7 @@ void GameScreen::Start()
 
 	// We load our sounds // PATH, CHANNEL, LOOP? -> // BGM plays with loop, but sfx just one time
 	m_bgm = new sound(SND_BGM_GAME, 1, true);
-	m_sfx = new sound(SND_SFX_TAP, 2, false);
+//	m_sfx = new sound(SND_SFX_TAP, 2, false);
 
 	// We play our bgm
 	m_bgm->play();
@@ -289,13 +291,14 @@ void GameScreen::Draw()
 		sftd_draw_text(font, 20, 20, C_SECOND_BLUE, 20, arraychapter[arrayselect].substr(arraychapter[arrayselect].rfind("/") + 1).c_str());
 
 		break;
+	case MENU_TYPE::ANIME_READY_TO_WATCH:
+		sftd_draw_text(font, 20, 20, C_SECOND_BLUE, 20, "Pulsa A para ver el episodio");
+		break;
+
 	case MENU_TYPE::SEARCHING:
 		//sftd_draw_text(font, 20, 20, C_SECOND_BLUE, 20, "Buscar anime:");
 		break;
 	}
-
-
-	//75, 60
 
 	sf2d_end_frame();
 
@@ -326,19 +329,6 @@ void GameScreen::Draw()
 	// SALIR
 	sf2d_draw_texture(m_button, 18, 168);
 	sftd_draw_text(font, 135, 172, C_SECOND_BLUE, 30, "SALIR");
-
-	/*
-	switch (menu_status)
-	{
-		case MENU_TYPE::MAIN:
-			break;
-		case MENU_TYPE::LAST_ANIMES:
-			break;
-		case MENU_TYPE::SEARCHING:
-			break;
-	}
-    */
-
 	sf2d_end_frame();
 }
 
@@ -400,17 +390,14 @@ void GameScreen::CheckInputs()
 		else if (menu_status == MENU_TYPE::LAST_ANIMES)
 		{
 			menu_status = MENU_TYPE::MAIN;
-			pressed = 0;
 		}
 		else if (menu_status == MENU_TYPE::ANIME_SELECTED)
 		{
 			menu_status = MENU_TYPE::LAST_ANIMES;
-			pressed = 0;
 		}
 		else if (menu_status == MENU_TYPE::ANIME_READY_TO_WATCH)
 		{
 			menu_status = MENU_TYPE::ANIME_SELECTED;
-			pressed = 0;
 		}
 	}
 
@@ -426,8 +413,13 @@ void GameScreen::CheckInputs()
 		{
 			menu_status = MENU_TYPE::LAST_ANIMES;
 		}
+		else if (menu_status == MENU_TYPE::LAST_ANIMES)
+		{
+			menu_status = MENU_TYPE::ANIME_SELECTED;
+		}
 		else if (menu_status == MENU_TYPE::ANIME_SELECTED)
 		{
+			menu_status = MENU_TYPE::ANIME_READY_TO_WATCH;
 			ret = http_download(arraychapter[arrayselect].c_str());
 			int val1 = content.find("server=hyperion");
 			int val2 = content.find('"', val1);
@@ -445,8 +437,6 @@ void GameScreen::CheckInputs()
 			cout << "VIDEO EXTRAIDO: PRESIONA START PARA CONTINUAR." << endl;
 			APT_PrepareToStartSystemApplet(APPID_WEB);
 			APT_StartSystemApplet(APPID_WEB, gdrive.c_str(), 1024, 0);
-			
-			menu_status = MENU_TYPE::ANIME_READY_TO_WATCH;
 		}
 		else if (menu_status == MENU_TYPE::ANIME_READY_TO_WATCH)
 		{
@@ -462,7 +452,6 @@ void GameScreen::CheckInputs()
 			if (menu_status == MENU_TYPE::MAIN)
 			{
 				menu_status = MENU_TYPE::LAST_ANIMES;
-				pressed = 0;
 			}
 			
 		}

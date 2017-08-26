@@ -38,7 +38,7 @@ Copyright (C) 2017 Manuel Rodríguez Matesanz
 #include <iostream>
 #include <3ds.h>
 #include <Vector>
-
+#include <cstddef>  
 
 class GameScreen : public Scene
 {
@@ -60,7 +60,6 @@ private:
 
 	float m_offset;						// Offset for 3D
 	float m_listOffset;
-
 	sf2d_texture * m_selector;
 	sf2d_texture * m_banner;
 	sf2d_texture * m_button;	    // Button image
@@ -74,6 +73,8 @@ private:
 	std::vector<std::string> arraychapter;
 	int arrayselect;
 	int arraycount;
+	//int m_episodeSelected;
+	//int m_maxEpisodeSelected;
 	MENU_TYPE menu_status;
 	touchPosition touch;
 	Result ret = 0;
