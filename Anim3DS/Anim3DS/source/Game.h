@@ -1,4 +1,4 @@
-/* This file is part of What's in the Box 3DS!
+/* This file is part of Anim3DS!
 
 Copyright (C) 2017 Manuel Rodríguez Matesanz
 >    This program is free software: you can redistribute it and/or modify
