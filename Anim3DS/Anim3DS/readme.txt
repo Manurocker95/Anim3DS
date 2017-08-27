@@ -7,12 +7,15 @@ You can watch anime with this.
 What does this have that the original doesn't?
 
 - UI
-- You can search an anime from URL
-- You can select one of the anime and select a previous episode
+- Background Music
+- You can search an anime by URL
+- You can search an anime by name
+- You can select an anime and select a previous episode
+- You can save your watched animes and set favs.
 
 Credits:
 
     - Smealum & Yellows8: Scene3DS and stuff, you know.
     - Xerpi: SF2D, SFTD, SFIL, Portlibs
-	- Sound Class: Cheuble  
-	- Original RipEx: DARKXEX
+    - Sound Class: Cheuble  
+    - Original RipEx: DARKXEX
