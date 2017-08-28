@@ -1,0 +1,8 @@
+*.elf
+*.3dsx
+*.cia
+*.smdh
+*.exe
+*.jar
+build/
+Debug/
