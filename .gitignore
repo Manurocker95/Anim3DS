@@ -1,3 +1,10 @@
+*.elf
+*.3dsx
+*.cia
+*.smdh
+*.exe
+*.jar
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
