@@ -180,6 +180,7 @@ void GameScreen::Start()
 	m_offset = 0;
 	m_listOffset = 0;
 	off = 30;
+	//chapterSelected = "";
 	menu_status = GameScreen::MENU_TYPE::MAIN;
 
 	// We load our images and place them into RAM so they can be painted
@@ -190,7 +191,7 @@ void GameScreen::Start()
 
 void GameScreen::InitializeViewer()
 {
-	m_internetInitialized = httpcInit(0); // Buffer size when POST/PUT.
+	httpcInit(0); // Buffer size when POST/PUT.
 
 	ret = http_download("http://animeflv.net/");
 	int vval1 = content.find("ltimos episodios");
@@ -420,7 +421,7 @@ void GameScreen::CheckInputs()
 		else if (menu_status == MENU_TYPE::LAST_ANIMES)
 		{
 			menu_status = MENU_TYPE::ANIME_SELECTED;
-			//chapterSelected = arraychapter[arrayselect];
+			chapterSelected = arraychapter[arrayselect];
 		}
 		else if (menu_status == MENU_TYPE::ANIME_SELECTED)
 		{
