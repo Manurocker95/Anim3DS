@@ -19,3 +19,4 @@ Credits:
     - Bernardogiordano: PP2D
     - Sound Class: Cheuble  
     - Original RipEx: DARKXEX
+    - AstronautLevel: Battery Stuff
