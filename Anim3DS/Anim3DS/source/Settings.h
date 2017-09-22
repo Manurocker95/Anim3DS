@@ -27,11 +27,6 @@ Copyright (C) 2017 Manuel Rodríguez Matesanz
 #define VERSION "1.0"
 #define DEBUGMODE false
 
-//3D Configuration
-#define STEREOSCOPIC_3D_ACTIVATED false					// If 3D effect is activated
-#define CONFIG_3D_SLIDERSTATE (*(float *)0x1FF81080)	// Offset of the 3D slidebar in the console
-#define MULTIPLIER_3D 10								// Number of pixels moved by the offset. offset = Multiplier x sliderstate
-
 // Color definition
 #define C_BLACK RGBA8(0, 0, 0, 255)
 #define C_WHITE RGBA8(255, 255, 255, 255)
@@ -41,6 +36,5 @@ Copyright (C) 2017 Manuel Rodríguez Matesanz
 #define C_SECOND_BLUE RGBA8(0, 102, 173, 255)
 #define C_SEMI_RED RGBA8(255, 0, 0, 120) 
 
-// Some global variables for texts
-#define TAPTEXTSIZE 40
-#define MESSAGESIZE 40
+// Number of chapters shown
+#define CHAPTERSHOWN 9

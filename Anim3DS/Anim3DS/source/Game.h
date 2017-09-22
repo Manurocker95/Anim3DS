@@ -25,7 +25,7 @@ Copyright (C) 2017 Manuel Rodríguez Matesanz
 #include "sound.h"
 #include "scene.h"
 #include "SceneManager.h"
-
+#include <time.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -56,15 +56,15 @@ private:
 
 	float m_offset;						// Offset for 3D
 	float m_listOffset;
-	
+	Result m_internetInitialized;
 	sound * m_bgm, *m_sfx;			// Sounds
 
 	std::string content = "";
+	std::string chapterSelected = "";
 	std::vector<std::string> arraychapter;
 	int arrayselect;
 	int arraycount;
-	int m_episodeSelected;
-	int m_maxEpisodeSelected;
+	int off;
 	MENU_TYPE menu_status;
 	touchPosition touch;
 	Result ret = 0;

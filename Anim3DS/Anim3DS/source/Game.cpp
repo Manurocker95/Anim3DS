@@ -179,7 +179,7 @@ void GameScreen::Start()
 	// We initialize our game variables
 	m_offset = 0;
 	m_listOffset = 0;
-
+	off = 30;
 	menu_status = GameScreen::MENU_TYPE::MAIN;
 
 	// We load our images and place them into RAM so they can be painted
@@ -190,7 +190,8 @@ void GameScreen::Start()
 
 void GameScreen::InitializeViewer()
 {
-	httpcInit(0); // Buffer size when POST/PUT.
+	m_internetInitialized = httpcInit(0); // Buffer size when POST/PUT.
+
 	ret = http_download("http://animeflv.net/");
 	int vval1 = content.find("ltimos episodios");
 	int vval2 = content.find("ltimos animes", vval1);
@@ -223,13 +224,38 @@ void GameScreen::InitializeViewer()
 
 void GameScreen::Draw()
 {
-
-	int off = 0;
+	u8 battery_charging;
+	PTMU_GetBatteryChargeState(&battery_charging);
+	u8 battery_status;
+	PTMU_GetBatteryLevel(&battery_status);
+	
+	time_t t = time(NULL);
+	struct tm tm = *localtime(&t);
 
 	// Top Screen
 	pp2d_begin_draw(GFX_TOP);
 	pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 0, 0, TOP_WIDTH, 0, TOP_WIDTH, HEIGHT);
 
+	pp2d_draw_rectangle(0, 0, 400, 23, C_SECOND_BLUE);
+
+	pp2d_draw_textf(7, 2, 0.6, 0.6, C_WHITE, "%.2i", tm.tm_hour);
+	pp2d_draw_text(28, 2, 0.6, 0.6, C_WHITE, (tm.tm_sec % 2 == 1) ? ":" : " ");
+	pp2d_draw_textf(34, 2, 0.6, 0.6, C_WHITE, "%.2i", tm.tm_min);
+	
+	pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 357, 2, 294 + battery_status * 37, HEIGHT * 2, 37, 17);
+	
+	if (battery_charging)
+	{
+		pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 357, 2, 479, HEIGHT * 2, 37, 17);
+
+	}	
+	else
+	{
+		pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 357, 2, 294 + battery_status * 37, HEIGHT * 2, 37, 17);
+	}
+		
+	if (DEBUGMODE)
+		pp2d_draw_text(140, 220, 0.4f, 0.4f, C_SECOND_BLUE, std::to_string(battery_status).c_str());
 
 	switch (menu_status)
 	{
@@ -237,31 +263,49 @@ void GameScreen::Draw()
 
 		// BANNER - 
 		pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 75, 60, 0, 536, 256, 128);
-		pp2d_draw_text(140, 220, 0.4f, 0.4f, C_SECOND_BLUE, "Manurocker95 (C) 2017");
-
+		pp2d_draw_text(140, 6, 0.4f, 0.4f, C_WHITE, "Manurocker95 (C) 2017");
+		pp2d_draw_rectangle(0, 217, 400, 23, C_SECOND_BLUE);
+		pp2d_draw_text(130, 221, 0.5f, 0.5f, C_WHITE, "Selecciona una opcion");
 		break;
 	case MENU_TYPE::LAST_ANIMES:
 		
-		//TODO//sftd_draw_text(font, 20, 20, C_SECOND_BLUE, 20, arraychapter[arrayselect].substr(arraychapter[arrayselect].rfind("/") + 1).c_str());
-		
 		for (int i = 0; i < arraychapter.size(); i++)
 		{
-			if (i == arrayselect)
+			float _y = i * 18 + off + m_listOffset;
+
+			if (_y > 23 && _y < HEIGHT-30)
 			{
-				pp2d_draw_text(50, i * 14 + off + m_listOffset, 0.4f, 0.4f, C_SECOND_BLUE, "->");
+				if (i == arrayselect)
+				{
+					pp2d_draw_text(10, _y, 0.5f, 0.5f, C_SECOND_BLUE, "->");
+				}
+				pp2d_draw_text(25, _y, 0.5f, 0.5f, C_SECOND_BLUE, std::to_string(i + 1).c_str());
+				pp2d_draw_text(50, _y, 0.5f, 0.5f, C_SECOND_BLUE, arraychapter[i].substr(arraychapter[i].rfind("/") + 1).c_str());
 			}
-			pp2d_draw_text(65, i * 14 + off + m_listOffset, 0.4f, 0.4f, C_SECOND_BLUE, std::to_string(i).c_str());
-			pp2d_draw_text(85, i * 14 + off + m_listOffset, 0.4f, 0.4f, C_SECOND_BLUE, arraychapter[i].substr(arraychapter[i].rfind("/") + 1).c_str());
 		}	
-		
+
+		pp2d_draw_text(140, 6, 0.4f, 0.4f, C_WHITE, "Lista de ultimos animes");
+		pp2d_draw_rectangle(0, 217, 400, 23, C_SECOND_BLUE);
+		pp2d_draw_wtext(10, 222, 0.4f, 0.4f, C_WHITE, L"Pulsa \uE000 para seleccionar el anime");
+		pp2d_draw_text(240, 222, 0.4f, 0.4f, C_WHITE, "Usa el D-PAD para subir/bajar");
 		break;
 	case MENU_TYPE::ANIME_SELECTED:
 
-		pp2d_draw_text(20, 35, 0.4f, 0.4f, C_SECOND_BLUE, arraychapter[arrayselect].substr(arraychapter[arrayselect].rfind("/") + 1).c_str());
+		pp2d_draw_text(140, 6, 0.4f, 0.4f, C_WHITE, "Selecciona el episodio");
+		pp2d_draw_rectangle(0, 217, 400, 23, C_SECOND_BLUE);
+		pp2d_draw_text(20, 75, 0.6f, 0.6f, C_SECOND_BLUE, "Vas a ver: ");
+		pp2d_draw_text(20, 135, 0.6f, 0.6f, C_SECOND_BLUE, chapterSelected.substr(chapterSelected.rfind("/") + 1).c_str());
+		pp2d_draw_wtext(10, 222, 0.4f, 0.4f, C_WHITE, L"Pulsa \uE000 para seleccionar el episodio");
+		pp2d_draw_text(240, 222, 0.4f, 0.4f, C_WHITE, "Usa el D-PAD para subir/bajar");
 
 		break;
 	case MENU_TYPE::ANIME_READY_TO_WATCH:
-		pp2d_draw_text(20, 35, 0.4f, 0.4f, C_SECOND_BLUE, "Pulsa A para ver el episodio");
+		pp2d_draw_text(140, 6, 0.4f, 0.4f, C_WHITE, "Anim3DS");
+		pp2d_draw_text(20, 75, 0.6f, 0.6f, C_SECOND_BLUE, "Vas a ver: ");
+		pp2d_draw_text(20, 135, 0.6f, 0.6f, C_SECOND_BLUE, chapterSelected.substr(chapterSelected.rfind("/") + 1).c_str());
+		pp2d_draw_rectangle(0, 217, 400, 23, C_SECOND_BLUE);
+		pp2d_draw_wtext(130, 222, 0.5f, 0.5f, C_WHITE, L"Pulsa \uE000 para ver el episodio");
+
 		break;
 
 	case MENU_TYPE::SEARCHING:
@@ -272,20 +316,18 @@ void GameScreen::Draw()
 	// Bottom screen
 	pp2d_draw_on(GFX_BOTTOM);
 	pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 0, 0, TOP_WIDTH, HEIGHT, BOTTOM_WIDTH, HEIGHT);
-	pp2d_draw_text(80, 10, 0.5f, 0.5f, C_SECOND_BLUE, "Selecciona una opcion:");
-
 
 	// VER ULTIMOS ANIMES
-	pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 18, 36, 0, 480, 283, 56);
-	pp2d_draw_text(60, 55, 0.7f, 0.7f, C_SECOND_BLUE, "VER ULTIMOS ANIMES");
+	pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 18, 26, 0, 480, 283, 56);
+	pp2d_draw_text(60, 45, 0.7f, 0.7f, C_SECOND_BLUE, "VER ULTIMOS ANIMES");
 
 	// BUSCAR ANIME
-	pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 18, 102, 0, 480, 283, 56);
-	pp2d_draw_text(95, 121, 0.7f, 0.7f, C_SECOND_BLUE, "BUSCAR ANIME");
+	pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 18, 92, 0, 480, 283, 56);
+	pp2d_draw_text(95, 111, 0.7f, 0.7f, C_SECOND_BLUE, "BUSCAR ANIME");
 
 	// SALIR
-	pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 18, 168, 0, 480, 283, 56);
-	pp2d_draw_text(135, 187, 0.7f, 0.7f, C_SECOND_BLUE, "SALIR");
+	pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 18, 158, 0, 480, 283, 56);
+	pp2d_draw_text(135, 177, 0.7f, 0.7f, C_SECOND_BLUE, "SALIR");
 	pp2d_end_draw();
 
 }
@@ -307,6 +349,7 @@ void GameScreen::CheckInputs()
 	hidScanInput();
 
 	u32 pressed = hidKeysDown();
+	bool chapsel = false;
 
 	if ((pressed & KEY_RIGHT) || (pressed & KEY_DOWN))
 	{
@@ -315,10 +358,16 @@ void GameScreen::CheckInputs()
 			if (arrayselect < arraychapter.size() - 1)
 			{
 				arrayselect++;
+
+				if (arrayselect > CHAPTERSHOWN)
+				{
+					m_listOffset -= 18;
+				}
 			}
 			else
 			{
 				arrayselect = 0;
+				m_listOffset = 0;
 			}
 		}
 	}
@@ -330,10 +379,13 @@ void GameScreen::CheckInputs()
 			if (arrayselect > 0)
 			{
 				arrayselect--;
+				if (arrayselect >= CHAPTERSHOWN)
+					m_listOffset += 18;
 			}
 			else
 			{
 				arrayselect = arraychapter.size() - 1;
+				m_listOffset = -180;
 			}
 		}
 
@@ -359,12 +411,6 @@ void GameScreen::CheckInputs()
 		}
 	}
 
-	// We Exit pressing Select
-	if ((pressed & KEY_SELECT))
-	{
-		SceneManager::instance()->SaveDataAndExit();
-	}
-
 	if ((pressed & KEY_A))
 	{
 		if (menu_status == MENU_TYPE::MAIN)
@@ -374,6 +420,7 @@ void GameScreen::CheckInputs()
 		else if (menu_status == MENU_TYPE::LAST_ANIMES)
 		{
 			menu_status = MENU_TYPE::ANIME_SELECTED;
+			//chapterSelected = arraychapter[arrayselect];
 		}
 		else if (menu_status == MENU_TYPE::ANIME_SELECTED)
 		{
@@ -387,6 +434,9 @@ void GameScreen::CheckInputs()
 			cout << "VIDEO EXTRAIDO: PRESIONA START PARA CONTINUAR." << endl;
 			APT_PrepareToStartSystemApplet(APPID_WEB);
 			APT_StartSystemApplet(APPID_WEB, gdrive.c_str(), 1024, 0);
+			//chapsel = true;
+			//svcSleepThread(100000);
+
 		}
 		else if (menu_status == MENU_TYPE::ANIME_READY_TO_WATCH)
 		{
@@ -413,27 +463,21 @@ void GameScreen::CheckInputs()
 			swkbdSetValidation(&swkbd, SWKBD_NOTEMPTY_NOTBLANK, 0, 0);
 			swkbdSetFilterCallback(&swkbd, MyCallback, NULL);
 			button = swkbdInputText(&swkbd, mybuf, sizeof(mybuf));
-			if (mybuf == "")
+			if (mybuf == "" || mybuf == nullptr)
 				didit = false;
 
 			if (didit)
 			{
 				ret = http_download(mybuf);
-				int val1 = content.find("server=hyperion");
+				int val1 = content.find("ok.ru/videoembed/");
 				int val2 = content.find('"', val1);
-
 				string gdrive = content.substr(val1, val2 - val1);
-				gdrive = "http://s3.animeflv.com/check.php?" + gdrive;
-
+				gdrive = "https://" + gdrive;
 				content = "";
-				ret = http_download(gdrive.c_str());
-				val1 = content.find(":360");
-				val1 = content.find("http", val1);
-				val2 = content.find('"', val1);
-				gdrive = content.substr(val1, val2 - val1);
-				cout << gdrive << endl;
+				cout << "VIDEO EXTRAIDO: PRESIONA START PARA CONTINUAR." << endl;
 				APT_PrepareToStartSystemApplet(APPID_WEB);
 				APT_StartSystemApplet(APPID_WEB, gdrive.c_str(), 1024, 0);
+
 				didit = false;
 
 				menu_status = MENU_TYPE::ANIME_READY_TO_WATCH;
@@ -445,5 +489,12 @@ void GameScreen::CheckInputs()
 			SceneManager::instance()->SaveDataAndExit();
 		}
 	}
+
+	// We Exit pressing Select
+	if ((pressed & KEY_SELECT) || chapsel)
+	{
+		SceneManager::instance()->SaveDataAndExit();
+	}
+
 }
 
