@@ -2,12 +2,12 @@
 
 New version of RipEX, originally made by DARKXEX
 
-You can watch anime with this ONLY on New3DS/New2DS. 
+You can watch anime with this. 
 
 What does this have that the original doesn't?
 
 - UI
-- Background Music
+- Background Music (Disabled for now cz of UX)
 - You can search an anime by URL
 - You can search an anime by name
 - You can select an anime and select a previous episode
@@ -16,6 +16,6 @@ What does this have that the original doesn't?
 Credits:
 
     - Smealum & Yellows8: Scene3DS and stuff, you know.
-    - Xerpi: SF2D, SFTD, SFIL, Portlibs
+    - Bernardogiordano: PP2D
     - Sound Class: Cheuble  
     - Original RipEx: DARKXEX
