@@ -34,6 +34,26 @@ typedef unsigned long __PTRDIFF_TYPE__;
 typedef SSIZE_T ssize_t;
 #endif
 
+/* This file is part of Anim3DS!
+
+> Anim3DS is a RipEx Fork with UI and more stuff. 
+
+Copyright (C) 2017 Manuel Rodríguez Matesanz
+>    This program is free software: you can redistribute it and/or modify
+>    it under the terms of the GNU General Public License as published by
+>    the Free Software Foundation, either version 3 of the License, or
+>    (at your option) any later version.
+>
+>    This program is distributed in the hope that it will be useful,
+>    but WITHOUT ANY WARRANTY; without even the implied warranty of
+>    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>    GNU General Public License for more details.
+>
+>    You should have received a copy of the GNU General Public License
+>    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+>    See LICENSE for information.
+*/
+
 // Libraries Needed
 #include <3ds.h>
 #include <sf2d.h>
@@ -45,22 +65,18 @@ typedef SSIZE_T ssize_t;
 
 // Settings: We can configure everything from there easily
 #include "Settings.h"
+#include "pp2d/pp2d.h"
 
 int main()
 {
 	// We Initialize the services
 	srvInit();
 
-	// SF2D + SFIL
-	sf2d_init();
-	sf2d_set_clear_color(RGBA8(0, 0, 0, 255));
-	sf2d_set_3D(STEREOSCOPIC_3D_ACTIVATED);
-
-	//Sftd (Text)
-	sftd_init();
-
 	// Romfs
 	romfsInit();
+
+	// init pp2d environment
+	pp2d_init();
 
 	// Sound - We need to dump dsp on the console
 	ndspInit();
@@ -69,6 +85,11 @@ int main()
 	mkdir("/3ds", 0777);
 	mkdir("/3ds/data", 0777);
 	mkdir("/3ds/data/Anim3DS", 0777);
+
+	// set the screen background color
+	pp2d_set_screen_color(GFX_TOP, ABGR8(255, 0, 0, 0));
+	pp2d_set_screen_color(GFX_BOTTOM, ABGR8(255, 0, 0, 0));
+	//consoleInit(GFX_BOTTOM, NULL);
 
 	// We initialize the scene manager. It is created with a singleton so only one instance is created.
 	SceneManager::instance()->Start();
@@ -83,16 +104,12 @@ int main()
 		{
 			break;
 		}
-
-		// Swap the buffers to GPU for SF2D Painting
-		sf2d_swapbuffers();
 	}
 
 	// We Exit the services and end the program
 	romfsExit();
 	ndspExit();
-	sf2d_fini();
-	sftd_fini();
+	pp2d_exit();
 
 	return 0;
 }

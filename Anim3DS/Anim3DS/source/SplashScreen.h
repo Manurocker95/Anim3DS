@@ -1,4 +1,4 @@
-/* This file is part of Anim3DS!
+/* This file is part of Speaking Is Hard 3D!
 
 Copyright (C) 2017 Manuel Rodríguez Matesanz
 >    This program is free software: you can redistribute it and/or modify
@@ -29,9 +29,9 @@ Copyright (C) 2017 Manuel Rodríguez Matesanz
 #include "sound.h"
 #include "scene.h"
 #include "SceneManager.h"
+#include "pp2d/pp2d.h"
 
-
-class SplashScreen: public Scene
+class SplashScreen : public Scene
 {
 
 public:
@@ -40,18 +40,17 @@ public:
 
 	SplashScreen();						// Constructor
 	~SplashScreen();
-	
-	void Start() override;				 
-	void Draw() override;				
-	void CheckInputs() override;		
-	void Update() override;				
+
+	void Start() override;
+	void Draw() override;
+	void CheckInputs() override;
+	void Update() override;
 	void GoToGame();
 private:
 
 	int m_splashOpacity, m_scTimer;
 	bool m_sfxSplash, m_goToGame;
 	sound * m_SFX;
-	sf2d_texture * m_bgTop, *m_bgBot;
 	SPLASH_STATE m_splashOpeningState;
 };
 

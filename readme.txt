@@ -2,7 +2,7 @@
 
 New version of RipEX, originally made by DARKXEX
 
-You can watch anime with this. 
+You can watch anime with this ONLY on New3DS/New2DS. 
 
 What does this have that the original doesn't?
 

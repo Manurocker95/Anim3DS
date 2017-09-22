@@ -20,7 +20,7 @@ Copyright (C) 2017 Manuel Rodríguez Matesanz
 #define _FILEPATHS_H_
 
 /* Save Data */
-#define DATA_FILE "sdmc:/3ds/data/Manurocker95/data.sav"
+#define DATA_FILE "sdmc:/3ds/data/Anim3DS/data.sav"
 
 /* Sounds */
 // Background Music
@@ -31,16 +31,8 @@ Copyright (C) 2017 Manuel Rodríguez Matesanz
 #define SND_SFX_TAP "romfs:/resources/Sounds/SFX/tap.wav"
 
 /* Images */
-// Background
-#define IMG_BG_GAME_TOP "romfs:/resources/Art/bggametop.png"
-#define IMG_BG_GAME_BOT "romfs:/resources/Art/bggamebot.png"
-
-//Splash Screen BG
-#define IMG_SPLASHSCREEN "romfs:/resources/Art/sc.png"
-#define IMG_SPLASHSCREENBOTTOM "romfs:/resources/Art/scbot.png"
-
-// Sprites
-#define IMG_BANNER_SPRITE "romfs:/resources/Art/banner.png"
-#define IMG_BUTTON_SPRITE "romfs:/resources/Art/button.png"
+#define IMG_SPRITES "romfs:/resources/Art/images.png"
+#define TEXTURE_SPRITESHEET 1
+#define TEXTURE_SPRITESHEET2 2
 
 #endif

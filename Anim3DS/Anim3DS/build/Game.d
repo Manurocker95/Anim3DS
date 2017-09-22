@@ -1,6 +1,8 @@
 Game.o: d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp \
  d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.h \
- c:/devkitPro/libctru/include/sfil.h c:/devkitPro/libctru/include/3ds.h \
+ d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Settings.h \
+ d:/Github/Anim3DS/Anim3DS/Anim3DS/source/sound.h \
+ c:/devkitPro/libctru/include/3ds.h \
  c:/devkitPro/libctru/include/3ds/types.h \
  c:/devkitPro/libctru/include/3ds/result.h \
  c:/devkitPro/libctru/include/3ds/ipc.h \
@@ -69,7 +71,11 @@ Game.o: d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp \
  c:/devkitPro/libctru/include/3ds/sdmc.h \
  c:/devkitPro/libctru/include/3ds/romfs.h \
  c:/devkitPro/libctru/include/3ds/font.h \
- c:/devkitPro/libctru/include/sf2d.h \
+ d:/Github/Anim3DS/Anim3DS/Anim3DS/source/scene.h \
+ d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Filepaths.h \
+ d:/Github/Anim3DS/Anim3DS/Anim3DS/source/SceneManager.h \
+ d:/Github/Anim3DS/Anim3DS/Anim3DS/source/SplashScreen.h \
+ c:/devkitPro/libctru/include/sftd.h c:/devkitPro/libctru/include/sf2d.h \
  c:/devkitPro/libctru/include/citro3d.h \
  c:/devkitPro/libctru/include/c3d/types.h \
  c:/devkitPro/libctru/include/c3d/maths.h \
@@ -88,18 +94,16 @@ Game.o: d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp \
  c:/devkitPro/libctru/include/c3d/framebuffer.h \
  c:/devkitPro/libctru/include/c3d/renderbuffer.h \
  c:/devkitPro/libctru/include/c3d/renderqueue.h \
- c:/devkitPro/libctru/include/sftd.h \
- d:/Github/Anim3DS/Anim3DS/Anim3DS/build/font_ttf.h \
- d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Settings.h \
- d:/Github/Anim3DS/Anim3DS/Anim3DS/source/sound.h \
- d:/Github/Anim3DS/Anim3DS/Anim3DS/source/scene.h \
- d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Filepaths.h \
- d:/Github/Anim3DS/Anim3DS/Anim3DS/source/SceneManager.h \
- d:/Github/Anim3DS/Anim3DS/Anim3DS/source/SplashScreen.h
+ c:/devkitPro/libctru/include/sfil.h \
+ d:/Github/Anim3DS/Anim3DS/Anim3DS/source/pp2d/pp2d.h \
+ d:/Github/Anim3DS/Anim3DS/Anim3DS/source/pp2d/lodepng.h \
+ d:/Github/Anim3DS/Anim3DS/Anim3DS/build/vshader_shbin.h
 
 d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.h:
 
-c:/devkitPro/libctru/include/sfil.h:
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Settings.h:
+
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/sound.h:
 
 c:/devkitPro/libctru/include/3ds.h:
 
@@ -239,6 +243,16 @@ c:/devkitPro/libctru/include/3ds/romfs.h:
 
 c:/devkitPro/libctru/include/3ds/font.h:
 
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/scene.h:
+
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Filepaths.h:
+
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/SceneManager.h:
+
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/SplashScreen.h:
+
+c:/devkitPro/libctru/include/sftd.h:
+
 c:/devkitPro/libctru/include/sf2d.h:
 
 c:/devkitPro/libctru/include/citro3d.h:
@@ -277,18 +291,10 @@ c:/devkitPro/libctru/include/c3d/renderbuffer.h:
 
 c:/devkitPro/libctru/include/c3d/renderqueue.h:
 
-c:/devkitPro/libctru/include/sftd.h:
+c:/devkitPro/libctru/include/sfil.h:
 
-d:/Github/Anim3DS/Anim3DS/Anim3DS/build/font_ttf.h:
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/pp2d/pp2d.h:
 
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Settings.h:
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/pp2d/lodepng.h:
 
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/sound.h:
-
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/scene.h:
-
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Filepaths.h:
-
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/SceneManager.h:
-
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/SplashScreen.h:
+d:/Github/Anim3DS/Anim3DS/Anim3DS/build/vshader_shbin.h:

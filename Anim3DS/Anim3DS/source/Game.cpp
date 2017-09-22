@@ -45,23 +45,17 @@ Result GameScreen::http_download(const char *url)
 	u32 contentsize = 0, readsize = 0, size = 0;
 	u8 *buf, *lastbuf;
 
+	//programacion es mode 0
+	//buscar es mode 1
 
 	gfxFlushBuffers();
 
 	do {
 		ret = httpcOpenContext(&context, HTTPC_METHOD_GET, url, 1);
 
-		gfxFlushBuffers();
-
 		// This disables SSL cert verification, so https:// will be usable
 		ret = httpcSetSSLOpt(&context, SSLCOPT_DisableVerify);
 
-		gfxFlushBuffers();
-
-		// Enable Keep-Alive connections (on by default, pending ctrulib merge)
-		// ret = httpcSetKeepAlive(&context, HTTPC_KEEPALIVE_ENABLED);
-		// printf("return from httpcSetKeepAlive: %"PRId32"\n",ret);
-		// gfxFlushBuffers();
 
 		// Set a User-Agent header so websites can identify your application
 		ret = httpcAddRequestHeaderField(&context, "User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.81 Safari/537.36");
@@ -72,8 +66,6 @@ Result GameScreen::http_download(const char *url)
 		// This will delay connection teardown momentarily (typically 5s)
 		// in case there is another request made to the same server.
 		ret = httpcAddRequestHeaderField(&context, "Connection", "Keep-Alive");
-
-		gfxFlushBuffers();
 
 		ret = httpcBeginRequest(&context);
 		if (ret != 0) {
@@ -97,7 +89,7 @@ Result GameScreen::http_download(const char *url)
 			}
 			ret = httpcGetResponseHeader(&context, "Location", newurl, 0x1000);
 			url = newurl; // Change pointer to the url that we just learned
-			printf("redirecting to url: %s\n", url);
+						  //printf("redirecting to url: %s\n",url);
 			httpcCloseContext(&context); // Close this context before we try the next
 		}
 	} while ((statuscode >= 301 && statuscode <= 303) || (statuscode >= 307 && statuscode <= 308));
@@ -116,9 +108,6 @@ Result GameScreen::http_download(const char *url)
 		if (newurl != NULL) free(newurl);
 		return ret;
 	}
-
-
-	gfxFlushBuffers();
 
 	// Start with a single page buffer
 	buf = (u8*)malloc(0x1000);
@@ -160,27 +149,9 @@ Result GameScreen::http_download(const char *url)
 		if (newurl != NULL) free(newurl);
 		return -1;
 	}
-
-	//printf("%s", buf);
 	content = reinterpret_cast<char*>(buf);
 
-
-	gfxFlushBuffers();
-
-	//if(size>(240*400*3*2))size = 240*400*3*2;
-
-	//framebuf_top = gfxGetFramebuffer(GFX_TOP, GFX_LEFT, NULL, NULL);
-	//memcpy(framebuf_top, buf, size);
-
-	//gfxFlushBuffers();
-	//gfxSwapBuffers();
-
-	//framebuf_top = gfxGetFramebuffer(GFX_TOP, GFX_LEFT, NULL, NULL);
-	//memcpy(framebuf_top, buf, size);
-
-	gfxFlushBuffers();
-	gfxSwapBuffers();
-	gspWaitForVBlank();
+	//gspWaitForVBlank();
 
 	httpcCloseContext(&context);
 	free(buf);
@@ -197,50 +168,28 @@ GameScreen::GameScreen() : Scene ()
 
 GameScreen::~GameScreen()
 {
-	delete m_bgTop;
-	delete m_bgBot;
-	delete m_button;
 	delete m_bgm;
 	delete m_sfx;
-	delete font;
+	pp2d_free_texture(TEXTURE_SPRITESHEET2);
 }
 
 void GameScreen::Start()
 {
-	// We will use 2 channels for sounds: 1 = BGM, 2= Sound effects so they can be played at same time. You can set as channels as you want.
-	// We clear the channels
-	ndspChnWaveBufClear(1);
-	ndspChnWaveBufClear(2);
-
-	// We load our font called font.ttf in data folder. Set the data folder in MakeFile
-	font = sftd_load_font_mem(font_ttf, font_ttf_size);
 
 	// We initialize our game variables
 	m_offset = 0;
 	m_listOffset = 0;
-	int m_episodeSelected = 0;
-	int m_maxEpisodeSelected = 0;
+
 	menu_status = GameScreen::MENU_TYPE::MAIN;
 
 	// We load our images and place them into RAM so they can be painted
-	m_bgTop = sfil_load_PNG_file(IMG_BG_GAME_TOP, SF2D_PLACE_RAM);
-	m_bgBot = sfil_load_PNG_file(IMG_BG_GAME_BOT, SF2D_PLACE_RAM);
-	m_button = sfil_load_PNG_file(IMG_BUTTON_SPRITE, SF2D_PLACE_RAM);
-	m_banner = sfil_load_PNG_file(IMG_BANNER_SPRITE, SF2D_PLACE_RAM);
-
-	// We load our sounds // PATH, CHANNEL, LOOP? -> // BGM plays with loop, but sfx just one time
-	m_bgm = new sound(SND_BGM_GAME, 1, true);
-//	m_sfx = new sound(SND_SFX_TAP, 2, false);
-
-	// We play our bgm
-	m_bgm->play();
+	pp2d_load_texture_png(TEXTURE_SPRITESHEET2, IMG_SPRITES);
 
 	InitializeViewer();
 }
 
 void GameScreen::InitializeViewer()
 {
-
 	httpcInit(0); // Buffer size when POST/PUT.
 	ret = http_download("http://animeflv.net/");
 	int vval1 = content.find("ltimos episodios");
@@ -254,8 +203,7 @@ void GameScreen::InitializeViewer()
 	arrayselect = 0;
 	arraycount = 0;
 
-	while (val0 != -1)
-	{
+	while (val0 != -1) {
 		val0 = content.find("/ver/", val1);
 		if (val0 == -1) { break; }
 
@@ -278,76 +226,68 @@ void GameScreen::Draw()
 
 	int off = 0;
 
-	sf2d_start_frame(GFX_TOP, GFX_LEFT);
-	sf2d_draw_texture(m_bgTop, 0, 0);
+	// Top Screen
+	pp2d_begin_draw(GFX_TOP);
+	pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 0, 0, TOP_WIDTH, 0, TOP_WIDTH, HEIGHT);
+
 
 	switch (menu_status)
 	{
 	case MENU_TYPE::MAIN:
 
-		sf2d_draw_texture(m_banner, 75, 60);
-		sftd_draw_text(font, 160, 220, C_SECOND_BLUE, 15, "Manurocker95 (C) 2017");
+		// BANNER - 
+		pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 75, 60, 0, 536, 256, 128);
+		pp2d_draw_text(140, 220, 0.4f, 0.4f, C_SECOND_BLUE, "Manurocker95 (C) 2017");
 
 		break;
 	case MENU_TYPE::LAST_ANIMES:
 		
-		//sftd_draw_text(font, 20, 20, C_SECOND_BLUE, 20, arraychapter[arrayselect].substr(arraychapter[arrayselect].rfind("/") + 1).c_str());
+		//TODO//sftd_draw_text(font, 20, 20, C_SECOND_BLUE, 20, arraychapter[arrayselect].substr(arraychapter[arrayselect].rfind("/") + 1).c_str());
 		
 		for (int i = 0; i < arraychapter.size(); i++)
 		{
 			if (i == arrayselect)
 			{
-				sftd_draw_text(font, 50, i * 14 + off+ m_listOffset, C_SECOND_BLUE, 18, "->");
+				pp2d_draw_text(50, i * 14 + off + m_listOffset, 0.4f, 0.4f, C_SECOND_BLUE, "->");
 			}
-			sftd_draw_text(font, 65, i * 14 + off + m_listOffset, C_SECOND_BLUE, 18, std::to_string(i).c_str());
-			sftd_draw_text(font, 80, i * 14 + off+ m_listOffset, C_SECOND_BLUE, 18, arraychapter[i].substr(arraychapter[i].rfind("/") + 1).c_str());
+			pp2d_draw_text(65, i * 14 + off + m_listOffset, 0.4f, 0.4f, C_SECOND_BLUE, std::to_string(i).c_str());
+			pp2d_draw_text(85, i * 14 + off + m_listOffset, 0.4f, 0.4f, C_SECOND_BLUE, arraychapter[i].substr(arraychapter[i].rfind("/") + 1).c_str());
 		}	
 		
 		break;
 	case MENU_TYPE::ANIME_SELECTED:
 
-		sftd_draw_text(font, 20, 20, C_SECOND_BLUE, 20, arraychapter[arrayselect].substr(arraychapter[arrayselect].rfind("/") + 1).c_str());
+		pp2d_draw_text(20, 35, 0.4f, 0.4f, C_SECOND_BLUE, arraychapter[arrayselect].substr(arraychapter[arrayselect].rfind("/") + 1).c_str());
 
 		break;
 	case MENU_TYPE::ANIME_READY_TO_WATCH:
-		sftd_draw_text(font, 20, 20, C_SECOND_BLUE, 20, "Pulsa A para ver el episodio");
+		pp2d_draw_text(20, 35, 0.4f, 0.4f, C_SECOND_BLUE, "Pulsa A para ver el episodio");
 		break;
 
 	case MENU_TYPE::SEARCHING:
-		//sftd_draw_text(font, 20, 20, C_SECOND_BLUE, 20, "Buscar anime:");
+		pp2d_draw_text(20, 35, 0.4f, 0.4f, C_SECOND_BLUE, "Buscar anime");
 		break;
 	}
 
-	sf2d_end_frame();
+	// Bottom screen
+	pp2d_draw_on(GFX_BOTTOM);
+	pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 0, 0, TOP_WIDTH, HEIGHT, BOTTOM_WIDTH, HEIGHT);
+	pp2d_draw_text(80, 10, 0.5f, 0.5f, C_SECOND_BLUE, "Selecciona una opcion:");
 
-	// If we have activated 3D in Settings
-	if (STEREOSCOPIC_3D_ACTIVATED)
-	{
-		// We check the offset by the slider
-		m_offset = CONFIG_3D_SLIDERSTATE * MULTIPLIER_3D;
-		sf2d_start_frame(GFX_TOP, GFX_RIGHT);
-		sf2d_draw_texture(m_bgTop, 0, 0);
-		//sftd_draw_text(font, 15 - m_offset, 5, C_BLUE, TAPTEXTSIZE, "HELLO WORLD!!");
-		sf2d_end_frame();
-	}
 
-	// Bottom screen (We just show an image)
-	sf2d_start_frame(GFX_BOTTOM, GFX_LEFT);
-	sf2d_draw_texture(m_bgBot, 0, 0);
-	sftd_draw_text(font, 80, 5, C_SECOND_BLUE, 20, "Selecciona una opción:");
-	
 	// VER ULTIMOS ANIMES
-	sf2d_draw_texture(m_button, 18, 36);
-	sftd_draw_text(font, 60, 40, C_SECOND_BLUE, 30, "VER ÚLTIMOS ANIMES");
+	pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 18, 36, 0, 480, 283, 56);
+	pp2d_draw_text(60, 55, 0.7f, 0.7f, C_SECOND_BLUE, "VER ULTIMOS ANIMES");
 
 	// BUSCAR ANIME
-	sf2d_draw_texture(m_button, 18, 102);
-	sftd_draw_text(font, 95, 106, C_SECOND_BLUE, 30, "BUSCAR ANIME");
+	pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 18, 102, 0, 480, 283, 56);
+	pp2d_draw_text(95, 121, 0.7f, 0.7f, C_SECOND_BLUE, "BUSCAR ANIME");
 
 	// SALIR
-	sf2d_draw_texture(m_button, 18, 168);
-	sftd_draw_text(font, 135, 172, C_SECOND_BLUE, 30, "SALIR");
-	sf2d_end_frame();
+	pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 18, 168, 0, 480, 283, 56);
+	pp2d_draw_text(135, 187, 0.7f, 0.7f, C_SECOND_BLUE, "SALIR");
+	pp2d_end_draw();
+
 }
 
 void GameScreen::Update()
@@ -439,19 +379,11 @@ void GameScreen::CheckInputs()
 		{
 			menu_status = MENU_TYPE::ANIME_READY_TO_WATCH;
 			ret = http_download(arraychapter[arrayselect].c_str());
-			int val1 = content.find("server=hyperion");
+			int val1 = content.find("ok.ru/videoembed/");
 			int val2 = content.find('"', val1);
-
 			string gdrive = content.substr(val1, val2 - val1);
-			gdrive = "http://s3.animeflv.com/check.php?" + gdrive;
+			gdrive = "https://" + gdrive;
 			content = "";
-			ret = http_download(gdrive.c_str());
-			val1 = content.find(":360");
-			val1 = content.find("http", val1);
-			val2 = content.find('"', val1);
-
-			gdrive = content.substr(val1, val2 - val1);
-			cout << gdrive << endl;
 			cout << "VIDEO EXTRAIDO: PRESIONA START PARA CONTINUAR." << endl;
 			APT_PrepareToStartSystemApplet(APPID_WEB);
 			APT_StartSystemApplet(APPID_WEB, gdrive.c_str(), 1024, 0);

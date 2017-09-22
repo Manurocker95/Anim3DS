@@ -20,11 +20,6 @@ Copyright (C) 2017 Manuel Rodríguez Matesanz
 #ifndef _GAME_SCREEN_H_
 #define _GAME_SCREEN_H_
 
-#include "sfil.h"
-#include "sftd.h"
-#include "sf2d.h"
-
-#include "font_ttf.h"			//Don't worry if it seems to have error here
 #include "Settings.h"
 
 #include "sound.h"
@@ -39,6 +34,7 @@ Copyright (C) 2017 Manuel Rodríguez Matesanz
 #include <3ds.h>
 #include <Vector>
 #include <cstddef>  
+#include "pp2d/pp2d.h"
 
 class GameScreen : public Scene
 {
@@ -60,21 +56,15 @@ private:
 
 	float m_offset;						// Offset for 3D
 	float m_listOffset;
-	sf2d_texture * m_selector;
-	sf2d_texture * m_banner;
-	sf2d_texture * m_button;	    // Button image
-	sf2d_texture *m_bgTop,*m_bgBot;	// Background images
 	
 	sound * m_bgm, *m_sfx;			// Sounds
-	
-	sftd_font* font;				// Main Font
-	
+
 	std::string content = "";
 	std::vector<std::string> arraychapter;
 	int arrayselect;
 	int arraycount;
-	//int m_episodeSelected;
-	//int m_maxEpisodeSelected;
+	int m_episodeSelected;
+	int m_maxEpisodeSelected;
 	MENU_TYPE menu_status;
 	touchPosition touch;
 	Result ret = 0;

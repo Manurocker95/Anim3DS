@@ -1,5 +1,5 @@
-sound.o: d:/Homebrews/3DS/Anim3DS/Anim3DS/Anim3DS/source/sound.cpp \
- d:/Homebrews/3DS/Anim3DS/Anim3DS/Anim3DS/source/sound.h \
+sound.o: d:/Github/Anim3DS/Anim3DS/Anim3DS/source/sound.cpp \
+ d:/Github/Anim3DS/Anim3DS/Anim3DS/source/sound.h \
  c:/devkitPro/libctru/include/3ds.h \
  c:/devkitPro/libctru/include/3ds/types.h \
  c:/devkitPro/libctru/include/3ds/result.h \
@@ -70,7 +70,7 @@ sound.o: d:/Homebrews/3DS/Anim3DS/Anim3DS/Anim3DS/source/sound.cpp \
  c:/devkitPro/libctru/include/3ds/romfs.h \
  c:/devkitPro/libctru/include/3ds/font.h
 
-d:/Homebrews/3DS/Anim3DS/Anim3DS/Anim3DS/source/sound.h:
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/sound.h:
 
 c:/devkitPro/libctru/include/3ds.h:
 

@@ -47,9 +47,9 @@ private:
 	SceneManager() {};  // Private so that it can  not be called
 	static SceneManager* Instance;	// Singleton Instance
 
-	int m_times_we_have_run_the_program;	// Variable saved in our .sav
-	bool m_out;								// if we ended or not the program
-	Scene* m_actualScene;					// Scene running
+	std::string m_watchedAnimes;					// Variable saved in our .sav
+	bool m_out;										// if we ended or not the program
+	Scene* m_actualScene;							// Scene running
 };
 
 #endif

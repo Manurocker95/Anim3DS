@@ -1,4 +1,4 @@
-/* This file is part of Anim3DS!
+/* This file is part of Anime3DS!
 
 Copyright (C) 2017 Manuel Rodríguez Matesanz
 >    This program is free software: you can redistribute it and/or modify
@@ -18,67 +18,46 @@ Copyright (C) 2017 Manuel Rodríguez Matesanz
 
 #include "SplashScreen.h"
 
+// * Constructor 
 SplashScreen::SplashScreen() : Scene()
 {
 	Start();
 }
 
+// * Destructor
 SplashScreen::~SplashScreen()
 {
 	m_SFX->stop();
-	delete m_bgTop;
-	delete m_bgBot;
+	delete m_SFX;
+	pp2d_free_texture(TEXTURE_SPRITESHEET);
+	printf("Deleted Splash Screen Object");
 }
 
+// * Start - We initialize the variables
 void SplashScreen::Start()
 {
 	m_scTimer = 0;
 	m_splashOpacity = 0;
 	m_sfxSplash = false;
 	m_goToGame = false;
-	m_bgTop = sfil_load_PNG_file(IMG_SPLASHSCREEN, SF2D_PLACE_RAM);			
-	m_bgBot = sfil_load_PNG_file(IMG_SPLASHSCREENBOTTOM, SF2D_PLACE_RAM);
+	pp2d_load_texture_png(TEXTURE_SPRITESHEET, IMG_SPRITES);
 	m_SFX = new sound(SND_SFX_SPLASH, 2, false);
 }
 
+// * Draw the images every frame
 void SplashScreen::Draw()
 {
+	// Top Screen
+	pp2d_begin_draw(GFX_TOP);
+	pp2d_draw_texture_part_blend(TEXTURE_SPRITESHEET, 0, 0, 0, 0, TOP_WIDTH, HEIGHT, RGBA8(255, 255, 255, m_splashOpacity));
 
-	switch (m_splashOpeningState)
-	{
-	case OPENING:
-		// TopScreen
-		sf2d_start_frame(GFX_TOP, GFX_LEFT);
-		sf2d_draw_texture_blend(m_bgTop, 0, 0, RGBA8(255, 255, 255, m_splashOpacity));
-		sf2d_end_frame();
-		// BottomScreen
-		sf2d_start_frame(GFX_BOTTOM, GFX_LEFT);
-		sf2d_draw_texture_blend(m_bgBot, 0, 0, RGBA8(255, 255, 255, m_splashOpacity));
-		sf2d_end_frame();
-		break;
-	case STAY:
-		// TopScreen
-		sf2d_start_frame(GFX_TOP, GFX_LEFT);
-		sf2d_draw_texture_blend(m_bgTop, 0, 0, RGBA8(255, 255, 255, m_splashOpacity));
-		sf2d_end_frame();
-		// BottomScreen
-		sf2d_start_frame(GFX_BOTTOM, GFX_LEFT);
-		sf2d_draw_texture_blend(m_bgBot, 0, 0, RGBA8(255, 255, 255, m_splashOpacity));
-		sf2d_end_frame();
-		break;
-	case ENDING:
-		// TopScreen
-		sf2d_start_frame(GFX_TOP, GFX_LEFT);
-		sf2d_draw_texture_blend(m_bgTop, 0, 0, RGBA8(255, 255, 255, m_splashOpacity));
-		sf2d_end_frame();
-		// BottomScreen
-		sf2d_start_frame(GFX_BOTTOM, GFX_LEFT);
-		sf2d_draw_texture_blend(m_bgBot, 0, 0, RGBA8(255, 255, 255, m_splashOpacity));
-		sf2d_end_frame();
-		break;
-	}
+	// Bottom Screen
+	pp2d_draw_on(GFX_BOTTOM);
+	pp2d_draw_texture_part_blend(TEXTURE_SPRITESHEET, 0, 0, 0, HEIGHT, BOTTOM_WIDTH, HEIGHT, RGBA8(255, 255, 255, m_splashOpacity));
+	pp2d_end_draw();
 }
 
+// * Update game stuff (SplashScreen opacity)
 void SplashScreen::Update()
 {
 	switch (m_splashOpeningState)
@@ -127,14 +106,14 @@ void SplashScreen::Update()
 	}
 }
 
+// * We go to the game
 void SplashScreen::GoToGame()
 {
-	delete (m_SFX);
-	sf2d_free_texture(m_bgTop);
-	sf2d_free_texture(m_bgBot);
 	SceneManager::instance()->setActualScene(SceneManager::GAME);
+	delete(this);
 }
 
+// * We check the inputs
 void SplashScreen::CheckInputs()
 {
 	hidScanInput();
@@ -142,10 +121,9 @@ void SplashScreen::CheckInputs()
 	// Pressing select we exit
 	if ((hidKeysDown() & KEY_SELECT))
 	{
-		SceneManager::instance()->SaveDataAndExit();
+		SceneManager::instance()->exitGame();
 	}
 
-	// We can skip Intro if we press A or touch the bottom screen
 	if ((hidKeysDown() & KEY_A) || (hidKeysDown() & KEY_TOUCH))
 	{
 		m_goToGame = true;

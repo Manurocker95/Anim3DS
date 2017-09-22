@@ -38,7 +38,7 @@ void SceneManager::Start()
 // We read the data from our .sav
 void SceneManager::ReadData()
 {	
-	m_times_we_have_run_the_program = 1;
+	m_watchedAnimes = "";
 	
 	// We try to read the .sav file
 	std::ifstream myReadFile(DATA_FILE);
@@ -47,14 +47,14 @@ void SceneManager::ReadData()
 	if (myReadFile)
 	{
 		// We set our data and call to the splashScreen
-		myReadFile >> m_times_we_have_run_the_program;
+		myReadFile >> m_watchedAnimes;
 		m_actualScene = new SplashScreen();
 	}
 	else // If it doesn't exists
 	{
 		// We create the .sav file
 		std::ofstream outfile(DATA_FILE);
-		outfile << m_times_we_have_run_the_program;
+		outfile << m_watchedAnimes;
 		outfile.close();
 
 		// First time we don't need to show the splashscreen. If we want, we can but meh
@@ -66,7 +66,7 @@ void SceneManager::ReadData()
 void SceneManager::setActualScene(SCENES _scene)
 {
 	// We delete the pointer of the actual scene
-	delete (m_actualScene);
+	//delete (m_actualScene);
 
 	// We set the new scene
 	switch (_scene)
@@ -108,14 +108,12 @@ void SceneManager::exitGame()
 // We save and exit the program
 void SceneManager::SaveDataAndExit()
 {
-	m_times_we_have_run_the_program++;
+	m_watchedAnimes="Temporal ";
 
 	// We overwrite our .sav file with new data
 	std::ofstream outfile(DATA_FILE);
-	outfile << m_times_we_have_run_the_program;
+	outfile << m_watchedAnimes;
 	outfile.close();
 
 	m_out = true;
-
-	//delete(m_actualScene);
 }
