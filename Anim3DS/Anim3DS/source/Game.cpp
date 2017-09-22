@@ -180,6 +180,7 @@ void GameScreen::Start()
 	m_offset = 0;
 	m_listOffset = 0;
 	off = 30;
+
 	//chapterSelected = "";
 	menu_status = GameScreen::MENU_TYPE::MAIN;
 
@@ -225,13 +226,13 @@ void GameScreen::InitializeViewer()
 
 void GameScreen::Draw()
 {
+	time_t t = time(NULL);
+	struct tm tm = *localtime(&t);
+
 	u8 battery_charging;
 	PTMU_GetBatteryChargeState(&battery_charging);
 	u8 battery_status;
 	PTMU_GetBatteryLevel(&battery_status);
-	
-	time_t t = time(NULL);
-	struct tm tm = *localtime(&t);
 
 	// Top Screen
 	pp2d_begin_draw(GFX_TOP);
@@ -243,20 +244,15 @@ void GameScreen::Draw()
 	pp2d_draw_text(28, 2, 0.6, 0.6, C_WHITE, (tm.tm_sec % 2 == 1) ? ":" : " ");
 	pp2d_draw_textf(34, 2, 0.6, 0.6, C_WHITE, "%.2i", tm.tm_min);
 	
-	pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 357, 2, 294 + battery_status * 37, HEIGHT * 2, 37, 17);
+	pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 357, 2, 294 + (battery_status-1) * 37, HEIGHT * 2, 37, 17);
 	
 	if (battery_charging)
 	{
 		pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 357, 2, 479, HEIGHT * 2, 37, 17);
-
 	}	
-	else
-	{
-		pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 357, 2, 294 + battery_status * 37, HEIGHT * 2, 37, 17);
-	}
 		
 	if (DEBUGMODE)
-		pp2d_draw_text(140, 220, 0.4f, 0.4f, C_SECOND_BLUE, std::to_string(battery_status).c_str());
+		pp2d_draw_text(140, 220, 0.4f, 0.4f, C_SECOND_BLUE, std::to_string(0).c_str());
 
 	switch (menu_status)
 	{
@@ -335,7 +331,6 @@ void GameScreen::Draw()
 
 void GameScreen::Update()
 {
-
 }
 
 void GameScreen::CheckInputs()

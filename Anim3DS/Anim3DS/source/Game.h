@@ -58,7 +58,6 @@ private:
 	float m_listOffset;
 	Result m_internetInitialized;
 	sound * m_bgm, *m_sfx;			// Sounds
-
 	std::string content = "";
 	std::string chapterSelected = "";
 	std::vector<std::string> arraychapter;

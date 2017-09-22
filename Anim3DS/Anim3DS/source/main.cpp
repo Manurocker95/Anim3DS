@@ -81,6 +81,9 @@ int main()
 	// Sound - We need to dump dsp on the console
 	ndspInit();
 
+	// 3DS Stuff (Like Battery)
+	ptmuInit();
+
 	//Creating folders for our homebrew's save. Just rename the last to your Homebrew Name
 	mkdir("/3ds", 0777);
 	mkdir("/3ds/data", 0777);
@@ -110,6 +113,6 @@ int main()
 	romfsExit();
 	ndspExit();
 	pp2d_exit();
-
+	ptmuExit();
 	return 0;
 }
