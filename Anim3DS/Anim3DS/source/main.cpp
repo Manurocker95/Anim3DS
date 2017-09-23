@@ -84,6 +84,10 @@ int main()
 	// 3DS Stuff (Like Battery)
 	ptmuInit();
 
+	// Wifi
+
+	acInit();
+
 	//Creating folders for our homebrew's save. Just rename the last to your Homebrew Name
 	mkdir("/3ds", 0777);
 	mkdir("/3ds/data", 0777);
@@ -114,5 +118,7 @@ int main()
 	ndspExit();
 	pp2d_exit();
 	ptmuExit();
+	acExit();
+
 	return 0;
 }

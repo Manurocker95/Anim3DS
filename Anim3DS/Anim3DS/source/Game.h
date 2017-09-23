@@ -56,7 +56,7 @@ private:
 
 	float m_offset;						// Offset for 3D
 	float m_listOffset;
-	Result m_internetInitialized;
+	Result m_internetServiceInitialized;
 	sound * m_bgm, *m_sfx;			// Sounds
 	std::string content = "";
 	std::string chapterSelected = "";
@@ -67,11 +67,14 @@ private:
 	MENU_TYPE menu_status;
 	touchPosition touch;
 	Result ret = 0;
-
+	bool m_haveInternet;
+	bool m_initializedList;
 private:
 
 	Result http_download(const char *url);
 	void InitializeViewer();
+	void ToggleWifi();
+	void InitAnimeList();
 };
 
 #endif

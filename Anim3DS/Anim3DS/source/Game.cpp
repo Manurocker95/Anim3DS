@@ -180,6 +180,8 @@ void GameScreen::Start()
 	m_offset = 0;
 	m_listOffset = 0;
 	off = 30;
+	m_haveInternet = false;
+	m_initializedList = false;
 
 	//chapterSelected = "";
 	menu_status = GameScreen::MENU_TYPE::MAIN;
@@ -193,6 +195,23 @@ void GameScreen::Start()
 void GameScreen::InitializeViewer()
 {
 	httpcInit(0); // Buffer size when POST/PUT.
+
+	// We always turn wi-fi On (Cz we need it XD)
+	ToggleWifi();
+
+	u32 wifiStatus = 0;
+
+	// We check if we have internet connection
+	if (R_SUCCEEDED(ACU_GetWifiStatus(&wifiStatus)) && wifiStatus) 
+	{
+		m_haveInternet = true;
+		InitAnimeList();
+	}
+}
+
+void GameScreen::InitAnimeList()
+{
+	m_initializedList = true;
 
 	ret = http_download("http://animeflv.net/");
 	int vval1 = content.find("ltimos episodios");
@@ -240,17 +259,34 @@ void GameScreen::Draw()
 
 	pp2d_draw_rectangle(0, 0, 400, 23, C_SECOND_BLUE);
 
+	// Showing time 
 	pp2d_draw_textf(7, 2, 0.6, 0.6, C_WHITE, "%.2i", tm.tm_hour);
 	pp2d_draw_text(28, 2, 0.6, 0.6, C_WHITE, (tm.tm_sec % 2 == 1) ? ":" : " ");
 	pp2d_draw_textf(34, 2, 0.6, 0.6, C_WHITE, "%.2i", tm.tm_min);
 	
+	// Showing Battery icon
 	pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 357, 2, 294 + (battery_status-1) * 37, HEIGHT * 2, 37, 17);
 	
 	if (battery_charging)
 	{
 		pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 357, 2, 479, HEIGHT * 2, 37, 17);
 	}	
-		
+
+	// Showing Wifi icon
+	u32 wifiStrength = 0;
+	u32 wifiStatus = 0;
+	if (R_SUCCEEDED(ACU_GetWifiStatus(&wifiStatus)) && wifiStatus) {
+		wifiStrength = osGetWifiStrength();
+		m_haveInternet = true;
+	}
+	else 
+	{
+		wifiStrength = 0;
+		m_haveInternet = false;
+	}
+
+	pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 327, 2, 283 + wifiStrength * 20, 513, 20, 16);
+
 	if (DEBUGMODE)
 		pp2d_draw_text(140, 220, 0.4f, 0.4f, C_SECOND_BLUE, std::to_string(0).c_str());
 
@@ -265,21 +301,28 @@ void GameScreen::Draw()
 		pp2d_draw_text(130, 221, 0.5f, 0.5f, C_WHITE, "Selecciona una opcion");
 		break;
 	case MENU_TYPE::LAST_ANIMES:
-		
-		for (int i = 0; i < arraychapter.size(); i++)
+		if (m_initializedList && m_haveInternet)
 		{
-			float _y = i * 18 + off + m_listOffset;
-
-			if (_y > 23 && _y < HEIGHT-30)
+			for (int i = 0; i < arraychapter.size(); i++)
 			{
-				if (i == arrayselect)
+				float _y = i * 18 + off + m_listOffset;
+
+				if (_y > 23 && _y < HEIGHT - 30)
 				{
-					pp2d_draw_text(10, _y, 0.5f, 0.5f, C_SECOND_BLUE, "->");
+					if (i == arrayselect)
+					{
+						pp2d_draw_text(10, _y, 0.5f, 0.5f, C_SECOND_BLUE, "->");
+					}
+					pp2d_draw_text(25, _y, 0.5f, 0.5f, C_SECOND_BLUE, std::to_string(i + 1).c_str());
+					pp2d_draw_text(50, _y, 0.5f, 0.5f, C_SECOND_BLUE, arraychapter[i].substr(arraychapter[i].rfind("/") + 1).c_str());
 				}
-				pp2d_draw_text(25, _y, 0.5f, 0.5f, C_SECOND_BLUE, std::to_string(i + 1).c_str());
-				pp2d_draw_text(50, _y, 0.5f, 0.5f, C_SECOND_BLUE, arraychapter[i].substr(arraychapter[i].rfind("/") + 1).c_str());
 			}
-		}	
+		}
+		else
+		{
+			pp2d_draw_text(90, 100, 0.6f, 0.6f, C_SECOND_BLUE, "No tienes conexion a Internet.");
+			pp2d_draw_wtext(70, 122, 0.6f, 0.6f, C_SECOND_BLUE, L"Pulsa \uE001 para volver al menu principal.");
+		}
 
 		pp2d_draw_text(140, 6, 0.4f, 0.4f, C_WHITE, "Lista de ultimos animes");
 		pp2d_draw_rectangle(0, 217, 400, 23, C_SECOND_BLUE);
@@ -290,17 +333,37 @@ void GameScreen::Draw()
 
 		pp2d_draw_text(140, 6, 0.4f, 0.4f, C_WHITE, "Selecciona el episodio");
 		pp2d_draw_rectangle(0, 217, 400, 23, C_SECOND_BLUE);
-		pp2d_draw_text(20, 75, 0.6f, 0.6f, C_SECOND_BLUE, "Vas a ver: ");
-		pp2d_draw_text(20, 135, 0.6f, 0.6f, C_SECOND_BLUE, chapterSelected.substr(chapterSelected.rfind("/") + 1).c_str());
+
+		if (m_haveInternet)
+		{
+			pp2d_draw_text(20, 75, 0.6f, 0.6f, C_SECOND_BLUE, "Vas a ver: ");
+			pp2d_draw_text(20, 135, 0.6f, 0.6f, C_SECOND_BLUE, chapterSelected.substr(chapterSelected.rfind("/") + 1).c_str());
+		}
+		else
+		{
+			pp2d_draw_text(90, 100, 0.6f, 0.6f, C_SECOND_BLUE, "No tienes conexion a Internet.");
+			pp2d_draw_wtext(70, 122, 0.6f, 0.6f, C_SECOND_BLUE, L"Pulsa \uE001 para volver al menu principal.");
+		}
+
 		pp2d_draw_wtext(10, 222, 0.4f, 0.4f, C_WHITE, L"Pulsa \uE000 para seleccionar el episodio");
 		pp2d_draw_text(240, 222, 0.4f, 0.4f, C_WHITE, "Usa el D-PAD para subir/bajar");
 
 		break;
 	case MENU_TYPE::ANIME_READY_TO_WATCH:
-		pp2d_draw_text(140, 6, 0.4f, 0.4f, C_WHITE, "Anim3DS");
-		pp2d_draw_text(20, 75, 0.6f, 0.6f, C_SECOND_BLUE, "Vas a ver: ");
-		pp2d_draw_text(20, 135, 0.6f, 0.6f, C_SECOND_BLUE, chapterSelected.substr(chapterSelected.rfind("/") + 1).c_str());
+		pp2d_draw_text(140, 6, 0.4f, 0.4f, C_WHITE, "Anim3DS - Manurocker95");
 		pp2d_draw_rectangle(0, 217, 400, 23, C_SECOND_BLUE);
+
+		if (m_haveInternet)
+		{
+			pp2d_draw_text(20, 75, 0.6f, 0.6f, C_SECOND_BLUE, "Vas a ver: ");
+			pp2d_draw_text(20, 135, 0.6f, 0.6f, C_SECOND_BLUE, chapterSelected.substr(chapterSelected.rfind("/") + 1).c_str());
+		}
+		else
+		{
+			pp2d_draw_text(90, 100, 0.6f, 0.6f, C_SECOND_BLUE, "No tienes conexion a Internet.");
+			pp2d_draw_wtext(70, 122, 0.6f, 0.6f, C_SECOND_BLUE, L"Pulsa \uE001 para volver al menu principal.");
+		}
+
 		pp2d_draw_wtext(130, 222, 0.5f, 0.5f, C_WHITE, L"Pulsa \uE000 para ver el episodio");
 
 		break;
@@ -329,6 +392,15 @@ void GameScreen::Draw()
 
 }
 
+void GameScreen::ToggleWifi()
+{
+	if (R_SUCCEEDED(nwmExtInit()))
+	{
+		NWMEXT_ControlWirelessEnabled(true);
+	}
+	nwmExtExit();
+}
+
 void GameScreen::Update()
 {
 }
@@ -347,7 +419,7 @@ void GameScreen::CheckInputs()
 	u32 pressed = hidKeysDown();
 	bool chapsel = false;
 
-	if ((pressed & KEY_RIGHT) || (pressed & KEY_DOWN))
+	if (m_initializedList && m_haveInternet && ((pressed & KEY_RIGHT) || (pressed & KEY_DOWN)))
 	{
 		if (menu_status == MENU_TYPE::LAST_ANIMES)
 		{
@@ -368,7 +440,7 @@ void GameScreen::CheckInputs()
 		}
 	}
 
-	if ((pressed & KEY_LEFT) || (pressed & KEY_UP))
+	if (m_initializedList && m_haveInternet && ((pressed & KEY_LEFT) || (pressed & KEY_UP)))
 	{
 		if (menu_status == MENU_TYPE::LAST_ANIMES)
 		{
@@ -396,14 +468,25 @@ void GameScreen::CheckInputs()
 		else if (menu_status == MENU_TYPE::LAST_ANIMES)
 		{
 			menu_status = MENU_TYPE::MAIN;
+
+			if (!m_initializedList && m_haveInternet)
+			{
+				InitAnimeList();
+			}
 		}
 		else if (menu_status == MENU_TYPE::ANIME_SELECTED)
 		{
-			menu_status = MENU_TYPE::LAST_ANIMES;
+			if (m_haveInternet)
+				menu_status = MENU_TYPE::LAST_ANIMES;
+			else
+				menu_status = MENU_TYPE::MAIN;
 		}
 		else if (menu_status == MENU_TYPE::ANIME_READY_TO_WATCH)
 		{
-			menu_status = MENU_TYPE::ANIME_SELECTED;
+			if (m_haveInternet)
+				menu_status = MENU_TYPE::ANIME_SELECTED;
+			else
+				menu_status = MENU_TYPE::MAIN;
 		}
 	}
 
@@ -412,24 +495,36 @@ void GameScreen::CheckInputs()
 		if (menu_status == MENU_TYPE::MAIN)
 		{
 			menu_status = MENU_TYPE::LAST_ANIMES;
+			
+			if (!m_initializedList && m_haveInternet)
+			{
+				InitAnimeList();
+			}
 		}
 		else if (menu_status == MENU_TYPE::LAST_ANIMES)
 		{
-			menu_status = MENU_TYPE::ANIME_SELECTED;
-			chapterSelected = arraychapter[arrayselect];
+			if (m_initializedList && m_haveInternet)
+			{
+				menu_status = MENU_TYPE::ANIME_SELECTED;
+				chapterSelected = arraychapter[arrayselect];
+			}
 		}
 		else if (menu_status == MENU_TYPE::ANIME_SELECTED)
 		{
-			menu_status = MENU_TYPE::ANIME_READY_TO_WATCH;
-			ret = http_download(arraychapter[arrayselect].c_str());
-			int val1 = content.find("ok.ru/videoembed/");
-			int val2 = content.find('"', val1);
-			string gdrive = content.substr(val1, val2 - val1);
-			gdrive = "https://" + gdrive;
-			content = "";
-			cout << "VIDEO EXTRAIDO: PRESIONA START PARA CONTINUAR." << endl;
-			APT_PrepareToStartSystemApplet(APPID_WEB);
-			APT_StartSystemApplet(APPID_WEB, gdrive.c_str(), 1024, 0);
+			if (m_haveInternet)
+			{
+				menu_status = MENU_TYPE::ANIME_READY_TO_WATCH;
+				ret = http_download(arraychapter[arrayselect].c_str());
+				int val1 = content.find("ok.ru/videoembed/");
+				int val2 = content.find('"', val1);
+				string gdrive = content.substr(val1, val2 - val1);
+				gdrive = "https://" + gdrive;
+				content = "";
+				cout << "VIDEO EXTRAIDO: PRESIONA START PARA CONTINUAR." << endl;
+				APT_PrepareToStartSystemApplet(APPID_WEB);
+				APT_StartSystemApplet(APPID_WEB, gdrive.c_str(), 1024, 0);
+			}
+
 			//chapsel = true;
 			//svcSleepThread(100000);
 
@@ -448,36 +543,45 @@ void GameScreen::CheckInputs()
 			if (menu_status == MENU_TYPE::MAIN)
 			{
 				menu_status = MENU_TYPE::LAST_ANIMES;
+
+				if (!m_initializedList && m_haveInternet)
+				{
+					InitAnimeList();
+				}
 			}
 			
 		}
 
+		// Searching Button
 		if ((touch.px > 18 && touch.px < 300) && (touch.py > 102 && touch.py < 156))
 		{
-			didit = true;
-			swkbdInit(&swkbd, SWKBD_TYPE_WESTERN, 2, -1);
-			swkbdSetValidation(&swkbd, SWKBD_NOTEMPTY_NOTBLANK, 0, 0);
-			swkbdSetFilterCallback(&swkbd, MyCallback, NULL);
-			button = swkbdInputText(&swkbd, mybuf, sizeof(mybuf));
-			if (mybuf == "" || mybuf == nullptr)
-				didit = false;
-
-			if (didit)
+			if (m_haveInternet)
 			{
-				ret = http_download(mybuf);
-				int val1 = content.find("ok.ru/videoembed/");
-				int val2 = content.find('"', val1);
-				string gdrive = content.substr(val1, val2 - val1);
-				gdrive = "https://" + gdrive;
-				content = "";
-				cout << "VIDEO EXTRAIDO: PRESIONA START PARA CONTINUAR." << endl;
-				APT_PrepareToStartSystemApplet(APPID_WEB);
-				APT_StartSystemApplet(APPID_WEB, gdrive.c_str(), 1024, 0);
+				didit = true;
+				swkbdInit(&swkbd, SWKBD_TYPE_WESTERN, 2, -1);
+				swkbdSetValidation(&swkbd, SWKBD_NOTEMPTY_NOTBLANK, 0, 0);
+				swkbdSetFilterCallback(&swkbd, MyCallback, NULL);
+				button = swkbdInputText(&swkbd, mybuf, sizeof(mybuf));
+				if (mybuf == "" || mybuf == nullptr)
+					didit = false;
 
-				didit = false;
+				if (didit)
+				{
+					ret = http_download(mybuf);
+					int val1 = content.find("ok.ru/videoembed/");
+					int val2 = content.find('"', val1);
+					string gdrive = content.substr(val1, val2 - val1);
+					gdrive = "https://" + gdrive;
+					content = "";
+					cout << "VIDEO EXTRAIDO: PRESIONA START PARA CONTINUAR." << endl;
+					APT_PrepareToStartSystemApplet(APPID_WEB);
+					APT_StartSystemApplet(APPID_WEB, gdrive.c_str(), 1024, 0);
 
-				menu_status = MENU_TYPE::ANIME_READY_TO_WATCH;
-			}
+					didit = false;
+
+					menu_status = MENU_TYPE::ANIME_READY_TO_WATCH;
+				}
+			}	
 		}
 
 		if ((touch.px > 18 && touch.px < 300) && (touch.py > 172 && touch.py < 226)) //+54
