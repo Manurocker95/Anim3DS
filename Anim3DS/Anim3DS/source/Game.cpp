@@ -347,19 +347,19 @@ void GameScreen::SearchByName(std::string mybuf)
 			val1++;
 		}
 
-		ret = http_download(gdrive.c_str());
+		Result ret2 = http_download(gdrive.c_str());
 
-		if (ret == 0)
+		if (ret2 == 0)
 		{
-			int vval1 = content.find("Lista de episodios");
-			int vval2 = content.find("fa-play-circle", vval1);
-			string gdrive = "";
+			vval1 = content.find("Lista de episodios");
+			vval2 = content.find("mCSB_1_scrollbar_vertical", vval1);
+			gdrive = "";
 
 			content = content.substr(vval1, vval2 - vval1);
 
-			int val1 = 1;
-			int val2;
-			int val0 = 0;
+			val1 = 1;
+			val2;
+			val0 = 0;
 			arraycount = 0;
 
 			while (val0 != -1) {
@@ -375,8 +375,8 @@ void GameScreen::SearchByName(std::string mybuf)
 			}
 
 			chapterSelected = gdrive;
-			int val1 = content.find("ok.ru/videoembed/");
-			int val2 = content.find('"', val1);
+			val1 = content.find("ok.ru/videoembed/");
+			val2 = content.find('"', val1);
 			string gdrive = content.substr(val1, val2 - val1);
 			gdrive = "https://" + gdrive;
 			content = "";
