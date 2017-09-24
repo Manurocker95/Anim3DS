@@ -72,6 +72,11 @@ int main()
 	// We Initialize the services
 	srvInit();
 
+	httpcInit(0); // Buffer size when POST/PUT.
+
+	// 
+	aptInit();
+
 	// Romfs
 	romfsInit();
 
@@ -119,6 +124,7 @@ int main()
 	pp2d_exit();
 	ptmuExit();
 	acExit();
-
+	aptExit();
+	httpcExit();
 	return 0;
 }

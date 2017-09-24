@@ -38,6 +38,7 @@ static SwkbdCallbackResult MyCallback(void* user, const char** ppMessage, const 
 Result GameScreen::http_download(const char *url)
 {
 	Result ret = 0;
+	m_debugValue = 0;
 	httpcContext context;
 	char *newurl = NULL;
 	u8* framebuf_top;
@@ -70,6 +71,7 @@ Result GameScreen::http_download(const char *url)
 		ret = httpcBeginRequest(&context);
 		if (ret != 0) {
 			httpcCloseContext(&context);
+			m_debugValue = -1;
 			if (newurl != NULL) free(newurl);
 			return ret;
 		}
@@ -77,6 +79,7 @@ Result GameScreen::http_download(const char *url)
 		ret = httpcGetResponseStatusCode(&context, &statuscode);
 		if (ret != 0) {
 			httpcCloseContext(&context);
+			m_debugValue = -2;
 			if (newurl != NULL) free(newurl);
 			return ret;
 		}
@@ -85,12 +88,14 @@ Result GameScreen::http_download(const char *url)
 			if (newurl == NULL) newurl = (char*)malloc(0x1000); // One 4K page for new URL
 			if (newurl == NULL) {
 				httpcCloseContext(&context);
+				m_debugValue = -3;
 				return -1;
 			}
 			ret = httpcGetResponseHeader(&context, "Location", newurl, 0x1000);
 			url = newurl; // Change pointer to the url that we just learned
 						  //printf("redirecting to url: %s\n",url);
 			httpcCloseContext(&context); // Close this context before we try the next
+			m_debugValue = -4;
 		}
 	} while ((statuscode >= 301 && statuscode <= 303) || (statuscode >= 307 && statuscode <= 308));
 
@@ -98,6 +103,7 @@ Result GameScreen::http_download(const char *url)
 
 		httpcCloseContext(&context);
 		if (newurl != NULL) free(newurl);
+		m_debugValue = -5;
 		return -2;
 	}
 
@@ -106,6 +112,7 @@ Result GameScreen::http_download(const char *url)
 	if (ret != 0) {
 		httpcCloseContext(&context);
 		if (newurl != NULL) free(newurl);
+		m_debugValue = -6;
 		return ret;
 	}
 
@@ -114,6 +121,7 @@ Result GameScreen::http_download(const char *url)
 	if (buf == NULL) {
 		httpcCloseContext(&context);
 		if (newurl != NULL) free(newurl);
+		m_debugValue = -7;
 		return -1;
 	}
 
@@ -128,6 +136,7 @@ Result GameScreen::http_download(const char *url)
 				httpcCloseContext(&context);
 				free(lastbuf);
 				if (newurl != NULL) free(newurl);
+				m_debugValue = -8;
 				return -1;
 			}
 		}
@@ -137,6 +146,7 @@ Result GameScreen::http_download(const char *url)
 		httpcCloseContext(&context);
 		if (newurl != NULL) free(newurl);
 		free(buf);
+		m_debugValue = -9;
 		return -1;
 	}
 
@@ -147,6 +157,7 @@ Result GameScreen::http_download(const char *url)
 		httpcCloseContext(&context);
 		free(lastbuf);
 		if (newurl != NULL) free(newurl);
+		m_debugValue = -10;
 		return -1;
 	}
 	content = reinterpret_cast<char*>(buf);
@@ -156,7 +167,7 @@ Result GameScreen::http_download(const char *url)
 	httpcCloseContext(&context);
 	free(buf);
 	if (newurl != NULL) free(newurl);
-
+	m_debugValue = 1;
 	return 0;
 }
 
@@ -179,11 +190,13 @@ void GameScreen::Start()
 	// We initialize our game variables
 	m_offset = 0;
 	m_listOffset = 0;
+	m_debugValue = 0;
 	off = 30;
+	m_chapterNumber = 1;
 	m_haveInternet = false;
 	m_initializedList = false;
-
-	//chapterSelected = "";
+	m_goingOut = false;
+	m_chapterMaxNumber = 1;
 	menu_status = GameScreen::MENU_TYPE::MAIN;
 
 	// We load our images and place them into RAM so they can be painted
@@ -194,8 +207,6 @@ void GameScreen::Start()
 
 void GameScreen::InitializeViewer()
 {
-	httpcInit(0); // Buffer size when POST/PUT.
-
 	// We always turn wi-fi On (Cz we need it XD)
 	ToggleWifi();
 
@@ -232,8 +243,6 @@ void GameScreen::InitAnimeList()
 		val1 = content.find("/ver/", val1);
 		val2 = (content.find('"', val1));
 		string gdrive = "http://animeflv.net" + content.substr(val1, val2 - val1);
-
-
 		arraychapter.push_back(gdrive);
 		cout << arraycount << ". " << gdrive.substr(gdrive.rfind("/") + 1) << endl;
 		arraycount++;
@@ -242,6 +251,71 @@ void GameScreen::InitAnimeList()
 
 	// arraychapter[arrayselect].substr(arraychapter[arrayselect].rfind("/") + 1)
 }
+
+void GameScreen::OtherEpisode(bool prev)
+{
+	ret = http_download(chapterSelected.c_str());
+
+	if (ret == 0)
+	{
+		if (prev)
+		{
+			int vval1 = content.find("CapNv");
+			int vval2 = content.find("CapNvPv fa-chevron-left", vval1);
+			string gdrive = "";
+
+			content = content.substr(vval1, vval2 - vval1);
+
+			int val1 = 1;
+			int val2;
+			int val0 = 0;
+			arraycount = 0;
+
+			while (val0 != -1) {
+				val0 = content.find("/ver/", val1);
+				if (val0 == -1) { break; }
+
+				val1 = content.find("/ver/", val1);
+				val2 = (content.find('"', val1));
+				gdrive = "http://animeflv.net" + content.substr(val1, val2 - val1);
+				cout << arraycount << ". " << gdrive.substr(gdrive.rfind("/") + 1) << endl;
+				arraycount++;
+				val1++;
+			}
+
+			chapterSelected = gdrive;
+		}
+		else
+		{
+			int vval1 = content.find("CapNvLs fa-th-list");
+			int vval2 = content.find("CapNvNx fa-chevron-right", vval1);
+			string gdrive = "";
+
+			content = content.substr(vval1, vval2 - vval1);
+
+			int val1 = 1;
+			int val2;
+			int val0 = 0;
+			arraycount = 0;
+
+			while (val0 != -1) {
+				val0 = content.find("/ver/", val1);
+				if (val0 == -1) { break; }
+
+				val1 = content.find("/ver/", val1);
+				val2 = (content.find('"', val1));
+				gdrive = "http://animeflv.net" + content.substr(val1, val2 - val1);
+				cout << arraycount << ". " << gdrive.substr(gdrive.rfind("/") + 1) << endl;
+				arraycount++;
+				val1++;
+			}
+
+			chapterSelected = gdrive;
+		}
+	}
+	
+}
+
 
 void GameScreen::Draw()
 {
@@ -287,15 +361,13 @@ void GameScreen::Draw()
 
 	pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 327, 2, 283 + wifiStrength * 20, 513, 20, 16);
 
-	if (DEBUGMODE)
-		pp2d_draw_text(140, 220, 0.4f, 0.4f, C_SECOND_BLUE, std::to_string(0).c_str());
-
 	switch (menu_status)
 	{
 	case MENU_TYPE::MAIN:
 
 		// BANNER - 
-		pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 75, 60, 0, 536, 256, 128);
+		//pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 75, 60, 0, 536, 256, 128);
+		pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 75, 60, 0, 664, 256, 128);
 		pp2d_draw_text(140, 6, 0.4f, 0.4f, C_WHITE, "Manurocker95 (C) 2017");
 		pp2d_draw_rectangle(0, 217, 400, 23, C_SECOND_BLUE);
 		pp2d_draw_text(130, 221, 0.5f, 0.5f, C_WHITE, "Selecciona una opcion");
@@ -337,7 +409,17 @@ void GameScreen::Draw()
 		if (m_haveInternet)
 		{
 			pp2d_draw_text(20, 75, 0.6f, 0.6f, C_SECOND_BLUE, "Vas a ver: ");
-			pp2d_draw_text(20, 135, 0.6f, 0.6f, C_SECOND_BLUE, chapterSelected.substr(chapterSelected.rfind("/") + 1).c_str());
+			
+			if (DEBUGMODE)
+			{
+				pp2d_draw_text(20, 135, 0.4f, 0.4f, C_SECOND_BLUE, chapterSelected.c_str());
+				pp2d_draw_text(20, 155, 0.6f, 0.6f, C_SECOND_BLUE, std::to_string(m_debugValue).c_str());
+			}
+			else
+			{
+				pp2d_draw_text(20, 135, 0.6f, 0.6f, C_SECOND_BLUE, chapterSelected.substr(chapterSelected.rfind("/") + 1).c_str());
+			}
+				
 		}
 		else
 		{
@@ -356,7 +438,16 @@ void GameScreen::Draw()
 		if (m_haveInternet)
 		{
 			pp2d_draw_text(20, 75, 0.6f, 0.6f, C_SECOND_BLUE, "Vas a ver: ");
-			pp2d_draw_text(20, 135, 0.6f, 0.6f, C_SECOND_BLUE, chapterSelected.substr(chapterSelected.rfind("/") + 1).c_str());
+
+			if (DEBUGMODE)
+			{
+				pp2d_draw_text(20, 135, 0.4f, 0.4f, C_SECOND_BLUE, chapterSelected.c_str());
+				pp2d_draw_text(20, 155, 0.6f, 0.6f, C_SECOND_BLUE, std::to_string(m_debugValue).c_str());
+			}
+			else
+			{
+				pp2d_draw_text(20, 135, 0.6f, 0.6f, C_SECOND_BLUE, chapterSelected.substr(chapterSelected.rfind("/") + 1).c_str());
+			}
 		}
 		else
 		{
@@ -387,7 +478,12 @@ void GameScreen::Draw()
 
 	// SALIR
 	pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 18, 158, 0, 480, 283, 56);
-	pp2d_draw_text(135, 177, 0.7f, 0.7f, C_SECOND_BLUE, "SALIR");
+	
+	if (menu_status == MENU_TYPE::ANIME_READY_TO_WATCH)
+		pp2d_draw_text(100, 177, 0.7f, 0.7f, C_SECOND_BLUE, "REPRODUCIR");
+	else
+		pp2d_draw_text(135, 177, 0.7f, 0.7f, C_SECOND_BLUE, "SALIR");
+
 	pp2d_end_draw();
 
 }
@@ -403,6 +499,7 @@ void GameScreen::ToggleWifi()
 
 void GameScreen::Update()
 {
+
 }
 
 void GameScreen::CheckInputs()
@@ -417,7 +514,11 @@ void GameScreen::CheckInputs()
 	hidScanInput();
 
 	u32 pressed = hidKeysDown();
-	bool chapsel = false;
+
+	if (m_goingOut)
+	{
+		SceneManager::instance()->SaveDataAndExit();
+	}
 
 	if (m_initializedList && m_haveInternet && ((pressed & KEY_RIGHT) || (pressed & KEY_DOWN)))
 	{
@@ -438,6 +539,11 @@ void GameScreen::CheckInputs()
 				m_listOffset = 0;
 			}
 		}
+		else if ((menu_status == MENU_TYPE::ANIME_SELECTED) && (m_chapterNumber + 1 <= m_chapterMaxNumber))
+		{
+			m_chapterNumber += 1;
+			OtherEpisode(false);
+		}
 	}
 
 	if (m_initializedList && m_haveInternet && ((pressed & KEY_LEFT) || (pressed & KEY_UP)))
@@ -455,6 +561,11 @@ void GameScreen::CheckInputs()
 				arrayselect = arraychapter.size() - 1;
 				m_listOffset = -180;
 			}
+		}
+		else if (menu_status == MENU_TYPE::ANIME_SELECTED && (m_chapterNumber-1 >= 1))
+		{
+			m_chapterNumber -= 1;
+			OtherEpisode(true);
 		}
 
 	}
@@ -507,31 +618,40 @@ void GameScreen::CheckInputs()
 			{
 				menu_status = MENU_TYPE::ANIME_SELECTED;
 				chapterSelected = arraychapter[arrayselect];
+				std::size_t found = chapterSelected.find_last_of("-");
+				m_chapterNumber = std::stoi(chapterSelected.substr(found + 1));
+				m_chapterMaxNumber = m_chapterNumber;
 			}
 		}
 		else if (menu_status == MENU_TYPE::ANIME_SELECTED)
 		{
 			if (m_haveInternet)
 			{
-				menu_status = MENU_TYPE::ANIME_READY_TO_WATCH;
-				ret = http_download(arraychapter[arrayselect].c_str());
-				int val1 = content.find("ok.ru/videoembed/");
-				int val2 = content.find('"', val1);
-				string gdrive = content.substr(val1, val2 - val1);
-				gdrive = "https://" + gdrive;
-				content = "";
-				cout << "VIDEO EXTRAIDO: PRESIONA START PARA CONTINUAR." << endl;
-				APT_PrepareToStartSystemApplet(APPID_WEB);
-				APT_StartSystemApplet(APPID_WEB, gdrive.c_str(), 1024, 0);
+				ret = http_download(chapterSelected.c_str());
+				if (ret == 0)
+				{
+					int val1 = content.find("ok.ru/videoembed/");
+					int val2 = content.find('"', val1);
+					string gdrive = content.substr(val1, val2 - val1);
+					gdrive = "https://" + gdrive;
+					content = "";
+					chapterToShow = gdrive;
+					APT_PrepareToStartSystemApplet(APPID_WEB);
+					APT_StartSystemApplet(APPID_WEB, chapterToShow.c_str(), 1024, 0);
+					menu_status = MENU_TYPE::ANIME_READY_TO_WATCH;
+					
+				}
+
 			}
-
-			//chapsel = true;
-			//svcSleepThread(100000);
-
 		}
 		else if (menu_status == MENU_TYPE::ANIME_READY_TO_WATCH)
 		{
-			SceneManager::instance()->SaveDataAndExit();
+			if (m_haveInternet)
+			{
+				//APT_PrepareToStartSystemApplet(APPID_WEB);
+				//APT_StartSystemApplet(APPID_WEB, chapterToShow.c_str(), 1024, 0);
+				m_goingOut = true;
+			}
 		}
 	}
 
@@ -562,39 +682,50 @@ void GameScreen::CheckInputs()
 				swkbdSetValidation(&swkbd, SWKBD_NOTEMPTY_NOTBLANK, 0, 0);
 				swkbdSetFilterCallback(&swkbd, MyCallback, NULL);
 				button = swkbdInputText(&swkbd, mybuf, sizeof(mybuf));
-				if (mybuf == "" || mybuf == nullptr)
+				if (mybuf == "" || mybuf == nullptr || button == SwkbdButton::SWKBD_BUTTON_NONE || button == SwkbdButton::SWKBD_BUTTON_LEFT)
+				{
+					//menu_status == MENU_TYPE::MAIN;
 					didit = false;
+				}					
 
 				if (didit)
 				{
+					chapterSelected = mybuf;
 					ret = http_download(mybuf);
-					int val1 = content.find("ok.ru/videoembed/");
-					int val2 = content.find('"', val1);
-					string gdrive = content.substr(val1, val2 - val1);
-					gdrive = "https://" + gdrive;
-					content = "";
-					cout << "VIDEO EXTRAIDO: PRESIONA START PARA CONTINUAR." << endl;
-					APT_PrepareToStartSystemApplet(APPID_WEB);
-					APT_StartSystemApplet(APPID_WEB, gdrive.c_str(), 1024, 0);
+
+					if (ret == 0)
+					{
+						int val1 = content.find("ok.ru/videoembed/");
+						int val2 = content.find('"', val1);
+						string gdrive = content.substr(val1, val2 - val1);
+						gdrive = "https://" + gdrive;
+						content = "";
+						chapterToShow = gdrive;
+						APT_PrepareToStartSystemApplet(APPID_WEB);
+						APT_StartSystemApplet(APPID_WEB, chapterToShow.c_str(), 1024, 0);
+						menu_status = MENU_TYPE::ANIME_READY_TO_WATCH;
+					}
 
 					didit = false;
-
-					menu_status = MENU_TYPE::ANIME_READY_TO_WATCH;
 				}
 			}	
 		}
 
-		if ((touch.px > 18 && touch.px < 300) && (touch.py > 172 && touch.py < 226)) //+54
+		// Exit Button / Select Button 
+		if (((pressed & KEY_SELECT)) || ((touch.px > 18 && touch.px < 300) && (touch.py > 172 && touch.py < 226))) //+54
 		{
-			SceneManager::instance()->SaveDataAndExit();
+			if (menu_status == MENU_TYPE::ANIME_READY_TO_WATCH)
+			{
+				if (m_haveInternet)
+				{
+					m_goingOut = true;
+				}
+			}
+			else
+			{
+				SceneManager::instance()->SaveDataAndExit();
+			}
 		}
 	}
-
-	// We Exit pressing Select
-	if ((pressed & KEY_SELECT) || chapsel)
-	{
-		SceneManager::instance()->SaveDataAndExit();
-	}
-
 }
 

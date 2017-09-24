@@ -28,7 +28,9 @@ Copyright (C) 2017 Manuel Rodríguez Matesanz
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sstream>
 #include <stdio.h>
+#include <cstddef>
 #include <inttypes.h>
 #include <iostream>
 #include <3ds.h>
@@ -60,6 +62,7 @@ private:
 	sound * m_bgm, *m_sfx;			// Sounds
 	std::string content = "";
 	std::string chapterSelected = "";
+	std::string chapterToShow = "";
 	std::vector<std::string> arraychapter;
 	int arrayselect;
 	int arraycount;
@@ -69,12 +72,17 @@ private:
 	Result ret = 0;
 	bool m_haveInternet;
 	bool m_initializedList;
+	bool m_goingOut;
+	int m_chapterNumber;
+	int m_chapterMaxNumber;
+	int m_debugValue;
 private:
 
 	Result http_download(const char *url);
 	void InitializeViewer();
 	void ToggleWifi();
 	void InitAnimeList();
+	void OtherEpisode(bool prev);
 };
 
 #endif
