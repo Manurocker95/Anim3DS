@@ -82,7 +82,9 @@ private:
 	void InitializeViewer();
 	void ToggleWifi();
 	void InitAnimeList();
-	void OtherEpisode(bool prev);
+	void OtherEpisode(bool prev, bool go_to_one = false);
+	void SearchByName(std::string mybuf);
+	void SearchByURL(std::string mybuf);
 };
 
 #endif

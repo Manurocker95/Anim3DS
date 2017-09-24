@@ -15,30 +15,46 @@ d:/Github/Anim3DS/Anim3DS/Anim3DS/source/pp2d/pp2d.h(43): warning GD54C37B2: "RG
    #define RGBA8(r, g, b, a) ((((a)&0xFF)<<24) | (((b)&0xFF)<<16) | (((g)&0xFF)<<8) | (((r)&0xFF)<<0))
    
   d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp: In member function 'Result GameScreen::http_download(const char*)':
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(43,6): warning G7C671A4C: unused variable 'framebuf_top' [-Wunused-variable]
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(44,6): warning G7C671A4C: unused variable 'framebuf_top' [-Wunused-variable]
     u8* framebuf_top;
         ^~~~~~~~~~~~
+  d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp: At global scope:
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(255,6): error GCE9E9FB4: prototype for 'void GameScreen::OtherEpisode(bool)' does not match any in class 'GameScreen'
+   void GameScreen::OtherEpisode(bool prev)
+        ^~~~~~~~~~
+  In file included from d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp:19:0:
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.h(85,7): error GA384DB9F: candidate is: void GameScreen::OtherEpisode(bool, bool)
+    void OtherEpisode(bool prev, bool go_to_one = false);
+         ^~~~~~~~~~~~
+  d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp: In member function 'void GameScreen::SearchByName(std::__cxx11::string)':
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(361,8): warning GFC433946: statement has no effect [-Wunused-value]
+      val2;
+          ^
   d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp: In member function 'virtual void GameScreen::Draw()':
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(308,22): warning G2A2880C6: comparison between signed and unsigned integer expressions [-Wsign-compare]
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(459,22): warning G2A2880C6: comparison between signed and unsigned integer expressions [-Wsign-compare]
       for (int i = 0; i < arraychapter.size(); i++)
                       ~~^~~~~~~~~~~~~~~~~~~~~
   d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp: In member function 'virtual void GameScreen::CheckInputs()':
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(442,20): warning G2A2880C6: comparison between signed and unsigned integer expressions [-Wsign-compare]
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(637,20): warning G2A2880C6: comparison between signed and unsigned integer expressions [-Wsign-compare]
       if (arrayselect < arraychapter.size() - 1)
           ~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(619,18): warning G96AC221F: comparison with string literal results in unspecified behavior [-Waddress]
-       if (mybuf == "" || mybuf == nullptr || button == SwkbdButton::SWKBD_BUTTON_NONE || button == SwkbdButton::SWKBD_BUTTON_LEFT)
-                    ^~
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(424,25): warning G7C671A4C: unused variable 'swkbdStatus' [-Wunused-variable]
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(795,19): warning G96AC221F: comparison with string literal results in unspecified behavior [-Waddress]
+        if (mybuf == "" || mybuf == nullptr || button == SwkbdButton::SWKBD_BUTTON_NONE || button == SwkbdButton::SWKBD_BUTTON_LEFT)
+                     ^~
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(826,19): warning G96AC221F: comparison with string literal results in unspecified behavior [-Waddress]
+        if (mybuf == "" || mybuf == nullptr || button == SwkbdButton::SWKBD_BUTTON_NONE || button == SwkbdButton::SWKBD_BUTTON_LEFT)
+                     ^~
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(619,25): warning G7C671A4C: unused variable 'swkbdStatus' [-Wunused-variable]
     static SwkbdStatusData swkbdStatus;
                            ^~~~~~~~~~~
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(425,27): warning G7C671A4C: unused variable 'swkbdLearning' [-Wunused-variable]
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(620,27): warning G7C671A4C: unused variable 'swkbdLearning' [-Wunused-variable]
     static SwkbdLearningData swkbdLearning;
                              ^~~~~~~~~~~~~
   d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp: At global scope:
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(425,27): warning GE3785B23: 'swkbdLearning' defined but not used [-Wunused-variable]
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(424,25): warning GD9DF5FBF: 'swkbdStatus' defined but not used [-Wunused-variable]
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(620,27): warning GE3785B23: 'swkbdLearning' defined but not used [-Wunused-variable]
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(619,25): warning GD9DF5FBF: 'swkbdStatus' defined but not used [-Wunused-variable]
     static SwkbdStatusData swkbdStatus;
                            ^~~~~~~~~~~
-  linking Anim3DS.elf
-  built ... Anim3DS.3dsx
+  make[1]: *** [Game.o] Error 1
+  make: *** [build] Error 2
+C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.MakeFile.Targets(44,5): error MSB3073: The command "make" exited with code 2.
