@@ -253,6 +253,8 @@ void GameScreen::InitAnimeList()
 
 void GameScreen::OtherEpisode(bool prev, bool go_to_one)
 {
+	std::string aux_chapter = chapterSelected;
+
 	ret = http_download(chapterSelected.c_str());
 
 	if (ret == 0)
@@ -313,6 +315,10 @@ void GameScreen::OtherEpisode(bool prev, bool go_to_one)
 		}
 	}
 	
+	if (chapterSelected == " " || chapterSelected == "")
+	{
+		chapterSelected = aux_chapter;
+	}
 }
 
 void GameScreen::SearchByName(std::string mybuf)
@@ -652,29 +658,43 @@ void GameScreen::CheckInputs()
 		SceneManager::instance()->SaveDataAndExit();
 	}
 
-	if (m_initializedList && m_haveInternet && ((pressed & KEY_RIGHT) || (pressed & KEY_DOWN)))
+	if (m_haveInternet && ((pressed & KEY_RIGHT) || (pressed & KEY_DOWN)))
 	{
-		if (menu_status == MENU_TYPE::LAST_ANIMES)
+		if (!m_fromSearching)
 		{
-			if (arrayselect < arraychapter.size() - 1)
+			if (m_initializedList)
 			{
-				arrayselect++;
-
-				if (arrayselect > CHAPTERSHOWN)
+				if (menu_status == MENU_TYPE::LAST_ANIMES)
 				{
-					m_listOffset -= 18;
+					if (arrayselect < arraychapter.size() - 1)
+					{
+						arrayselect++;
+
+						if (arrayselect > CHAPTERSHOWN)
+						{
+							m_listOffset -= 18;
+						}
+					}
+					else
+					{
+						arrayselect = 0;
+						m_listOffset = 0;
+					}
+				}
+				else if (menu_status == MENU_TYPE::ANIME_SELECTED && (m_chapterNumber - 1 >= 1))
+				{
+					m_chapterNumber -= 1;
+					OtherEpisode(true);
 				}
 			}
-			else
-			{
-				arrayselect = 0;
-				m_listOffset = 0;
-			}
 		}
-		else if ((menu_status == MENU_TYPE::ANIME_SELECTED) && (m_chapterNumber + 1 <= m_chapterMaxNumber))
+		else
 		{
-			m_chapterNumber += 1;
-			OtherEpisode(false);
+			if ((menu_status == MENU_TYPE::ANIME_SELECTED))
+			{
+				m_chapterNumber += 1;
+				OtherEpisode(false);
+			}
 		}
 	}
 
@@ -694,12 +714,11 @@ void GameScreen::CheckInputs()
 				m_listOffset = -180;
 			}
 		}
-		else if (menu_status == MENU_TYPE::ANIME_SELECTED && (m_chapterNumber-1 >= 1))
+		else if ((menu_status == MENU_TYPE::ANIME_SELECTED) && (m_chapterNumber + 1 <= m_chapterMaxNumber))
 		{
-			m_chapterNumber -= 1;
-			OtherEpisode(true);
+			m_chapterNumber += 1;
+			OtherEpisode(false);
 		}
-
 	}
 
 	if ((pressed & KEY_B))
@@ -751,7 +770,8 @@ void GameScreen::CheckInputs()
 		if (menu_status == MENU_TYPE::MAIN)
 		{
 			menu_status = MENU_TYPE::LAST_ANIMES;
-			
+			m_fromSearching = false;
+
 			if (!m_initializedList && m_haveInternet)
 			{
 				InitAnimeList();

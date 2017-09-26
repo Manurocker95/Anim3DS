@@ -25,7 +25,7 @@ Copyright (C) 2017 Manuel Rodríguez Matesanz
 
 // Version of our Homebrew and if we want to set a debugmode for us. We can disable it from here.
 #define VERSION "1.0"
-#define DEBUGMODE true
+#define DEBUGMODE false
 
 // Color definition
 #define C_BLACK RGBA8(0, 0, 0, 255)
