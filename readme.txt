@@ -19,6 +19,8 @@ Instructions:
 - Reboot your system
 - Run Anim3DS
 
+If first time the screen freezes in black with "Homebrew", just reboot and do it again. It's because it's creating stuff 
+
 Credits:
 
     - Smealum & Yellows8: Scene3DS and stuff, you know.

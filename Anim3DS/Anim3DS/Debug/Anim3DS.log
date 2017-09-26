@@ -18,77 +18,34 @@ d:/Github/Anim3DS/Anim3DS/Anim3DS/source/pp2d/pp2d.h(43): warning GD54C37B2: "RG
 d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(44,6): warning G7C671A4C: unused variable 'framebuf_top' [-Wunused-variable]
     u8* framebuf_top;
         ^~~~~~~~~~~~
+  d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp: In member function 'void GameScreen::SearchByName(std::__cxx11::string)':
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(370,8): warning GFC433946: statement has no effect [-Wunused-value]
+      val2;
+          ^
   d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp: In member function 'virtual void GameScreen::Draw()':
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(468,22): warning G2A2880C6: comparison between signed and unsigned integer expressions [-Wsign-compare]
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(477,22): warning G2A2880C6: comparison between signed and unsigned integer expressions [-Wsign-compare]
       for (int i = 0; i < arraychapter.size(); i++)
                       ~~^~~~~~~~~~~~~~~~~~~~~
   d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp: In member function 'virtual void GameScreen::CheckInputs()':
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(645,20): warning G2A2880C6: comparison between signed and unsigned integer expressions [-Wsign-compare]
-      if (arrayselect < arraychapter.size() - 1)
-          ~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(803,19): warning G96AC221F: comparison with string literal results in unspecified behavior [-Waddress]
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(669,22): warning G2A2880C6: comparison between signed and unsigned integer expressions [-Wsign-compare]
+        if (arrayselect < arraychapter.size() - 1)
+            ~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(885,19): warning G96AC221F: comparison with string literal results in unspecified behavior [-Waddress]
         if (mybuf == "" || mybuf == nullptr || button == SwkbdButton::SWKBD_BUTTON_NONE || button == SwkbdButton::SWKBD_BUTTON_LEFT)
                      ^~
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(834,19): warning G96AC221F: comparison with string literal results in unspecified behavior [-Waddress]
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(921,19): warning G96AC221F: comparison with string literal results in unspecified behavior [-Waddress]
         if (mybuf == "" || mybuf == nullptr || button == SwkbdButton::SWKBD_BUTTON_NONE || button == SwkbdButton::SWKBD_BUTTON_LEFT)
                      ^~
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(627,25): warning G7C671A4C: unused variable 'swkbdStatus' [-Wunused-variable]
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(647,25): warning G7C671A4C: unused variable 'swkbdStatus' [-Wunused-variable]
     static SwkbdStatusData swkbdStatus;
                            ^~~~~~~~~~~
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(628,27): warning G7C671A4C: unused variable 'swkbdLearning' [-Wunused-variable]
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(648,27): warning G7C671A4C: unused variable 'swkbdLearning' [-Wunused-variable]
     static SwkbdLearningData swkbdLearning;
                              ^~~~~~~~~~~~~
   d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp: At global scope:
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(628,27): warning GE3785B23: 'swkbdLearning' defined but not used [-Wunused-variable]
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(627,25): warning GD9DF5FBF: 'swkbdStatus' defined but not used [-Wunused-variable]
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(648,27): warning GE3785B23: 'swkbdLearning' defined but not used [-Wunused-variable]
+d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.cpp(647,25): warning GD9DF5FBF: 'swkbdStatus' defined but not used [-Wunused-variable]
     static SwkbdStatusData swkbdStatus;
                            ^~~~~~~~~~~
-  SceneManager.cpp
-  arm-none-eabi-g++ -MMD -MP -MF /d/Github/Anim3DS/Anim3DS/Anim3DS/build/SceneManager.d -g -Wall -O2 -mword-relocations -fomit-frame-pointer -ffunction-sections -march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft -I/d/Github/Anim3DS/Anim3DS/Anim3DS/include -I/c/devkitPro/libctru/include -I/c/devkitPro/portlibs/armv6k/include -I/c/devkitPro/portlibs/3ds/include -I/d/Github/Anim3DS/Anim3DS/Anim3DS/build -DARM11 -D_3DS -fno-rtti -fno-exceptions -std=gnu++11 -c /d/Github/Anim3DS/Anim3DS/Anim3DS/source/SceneManager.cpp -o SceneManager.o 
-  In file included from d:/Github/Anim3DS/Anim3DS/Anim3DS/source/SplashScreen.h:32:0,
-                   from d:/Github/Anim3DS/Anim3DS/Anim3DS/source/SceneManager.h:26,
-                   from d:/Github/Anim3DS/Anim3DS/Anim3DS/source/SceneManager.cpp:19:
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/pp2d/pp2d.h(43): warning GD54C37B2: "RGBA8" redefined
-   #define RGBA8(r, g, b, a) ((((r)&0xFF)<<0) | (((g)&0xFF)<<8) | (((b)&0xFF)<<16) | (((a)&0xFF)<<24))
-   
-  In file included from d:/Github/Anim3DS/Anim3DS/Anim3DS/source/SplashScreen.h:24:0,
-                   from d:/Github/Anim3DS/Anim3DS/Anim3DS/source/SceneManager.h:26,
-                   from d:/Github/Anim3DS/Anim3DS/Anim3DS/source/SceneManager.cpp:19:
-  c:/devkitPro/libctru/include/sf2d.h:24:0: note: this is the location of the previous definition
-   #define RGBA8(r, g, b, a) ((((a)&0xFF)<<24) | (((b)&0xFF)<<16) | (((g)&0xFF)<<8) | (((r)&0xFF)<<0))
-   
-  SplashScreen.cpp
-  arm-none-eabi-g++ -MMD -MP -MF /d/Github/Anim3DS/Anim3DS/Anim3DS/build/SplashScreen.d -g -Wall -O2 -mword-relocations -fomit-frame-pointer -ffunction-sections -march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft -I/d/Github/Anim3DS/Anim3DS/Anim3DS/include -I/c/devkitPro/libctru/include -I/c/devkitPro/portlibs/armv6k/include -I/c/devkitPro/portlibs/3ds/include -I/d/Github/Anim3DS/Anim3DS/Anim3DS/build -DARM11 -D_3DS -fno-rtti -fno-exceptions -std=gnu++11 -c /d/Github/Anim3DS/Anim3DS/Anim3DS/source/SplashScreen.cpp -o SplashScreen.o 
-  In file included from d:/Github/Anim3DS/Anim3DS/Anim3DS/source/Game.h:39:0,
-                   from d:/Github/Anim3DS/Anim3DS/Anim3DS/source/SceneManager.h:27,
-                   from d:/Github/Anim3DS/Anim3DS/Anim3DS/source/SplashScreen.h:31,
-                   from d:/Github/Anim3DS/Anim3DS/Anim3DS/source/SplashScreen.cpp:19:
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/pp2d/pp2d.h(43): warning GD54C37B2: "RGBA8" redefined
-   #define RGBA8(r, g, b, a) ((((r)&0xFF)<<0) | (((g)&0xFF)<<8) | (((b)&0xFF)<<16) | (((a)&0xFF)<<24))
-   
-  In file included from d:/Github/Anim3DS/Anim3DS/Anim3DS/source/SplashScreen.h:24:0,
-                   from d:/Github/Anim3DS/Anim3DS/Anim3DS/source/SplashScreen.cpp:19:
-  c:/devkitPro/libctru/include/sf2d.h:24:0: note: this is the location of the previous definition
-   #define RGBA8(r, g, b, a) ((((a)&0xFF)<<24) | (((b)&0xFF)<<16) | (((g)&0xFF)<<8) | (((r)&0xFF)<<0))
-   
-  d:/Github/Anim3DS/Anim3DS/Anim3DS/source/SplashScreen.cpp: In member function 'void SplashScreen::GoToGame()':
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/SplashScreen.cpp(113,13): warning GEC9AB9D8: deleting object of polymorphic class type 'SplashScreen' which has non-virtual destructor might cause undefined behavior [-Wdelete-non-virtual-dtor]
-    delete(this);
-               ^
-  main.cpp
-  arm-none-eabi-g++ -MMD -MP -MF /d/Github/Anim3DS/Anim3DS/Anim3DS/build/main.d -g -Wall -O2 -mword-relocations -fomit-frame-pointer -ffunction-sections -march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft -I/d/Github/Anim3DS/Anim3DS/Anim3DS/include -I/c/devkitPro/libctru/include -I/c/devkitPro/portlibs/armv6k/include -I/c/devkitPro/portlibs/3ds/include -I/d/Github/Anim3DS/Anim3DS/Anim3DS/build -DARM11 -D_3DS -fno-rtti -fno-exceptions -std=gnu++11 -c /d/Github/Anim3DS/Anim3DS/Anim3DS/source/main.cpp -o main.o 
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/main.cpp(19,9): warning G22EB126D: #pragma once in main file
-   #pragma once
-           ^~~~
-  In file included from d:/Github/Anim3DS/Anim3DS/Anim3DS/source/SplashScreen.h:32:0,
-                   from d:/Github/Anim3DS/Anim3DS/Anim3DS/source/SceneManager.h:26,
-                   from d:/Github/Anim3DS/Anim3DS/Anim3DS/source/main.cpp:64:
-d:/Github/Anim3DS/Anim3DS/Anim3DS/source/pp2d/pp2d.h(43): warning GD54C37B2: "RGBA8" redefined
-   #define RGBA8(r, g, b, a) ((((r)&0xFF)<<0) | (((g)&0xFF)<<8) | (((b)&0xFF)<<16) | (((a)&0xFF)<<24))
-   
-  In file included from d:/Github/Anim3DS/Anim3DS/Anim3DS/source/main.cpp:59:0:
-  c:/devkitPro/libctru/include/sf2d.h:24:0: note: this is the location of the previous definition
-   #define RGBA8(r, g, b, a) ((((a)&0xFF)<<24) | (((b)&0xFF)<<16) | (((g)&0xFF)<<8) | (((r)&0xFF)<<0))
-   
   linking Anim3DS.elf
   built ... Anim3DS.3dsx

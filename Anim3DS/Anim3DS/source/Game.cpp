@@ -692,32 +692,46 @@ void GameScreen::CheckInputs()
 		{
 			if ((menu_status == MENU_TYPE::ANIME_SELECTED))
 			{
-				m_chapterNumber += 1;
-				OtherEpisode(false);
+				m_chapterNumber -= 1;
+				OtherEpisode(true);
 			}
 		}
 	}
 
-	if (m_initializedList && m_haveInternet && ((pressed & KEY_LEFT) || (pressed & KEY_UP)))
+	if (m_haveInternet && ((pressed & KEY_LEFT) || (pressed & KEY_UP)))
 	{
-		if (menu_status == MENU_TYPE::LAST_ANIMES)
+		if (!m_fromSearching)
 		{
-			if (arrayselect > 0)
+			if (m_initializedList)
 			{
-				arrayselect--;
-				if (arrayselect >= CHAPTERSHOWN)
-					m_listOffset += 18;
-			}
-			else
-			{
-				arrayselect = arraychapter.size() - 1;
-				m_listOffset = -180;
+				if (menu_status == MENU_TYPE::LAST_ANIMES)
+				{
+					if (arrayselect > 0)
+					{
+						arrayselect--;
+						if (arrayselect >= CHAPTERSHOWN)
+							m_listOffset += 18;
+					}
+					else
+					{
+						arrayselect = arraychapter.size() - 1;
+						m_listOffset = -180;
+					}
+				}
+				else if ((menu_status == MENU_TYPE::ANIME_SELECTED) && (m_chapterNumber + 1 <= m_chapterMaxNumber))
+				{
+					m_chapterNumber += 1;
+					OtherEpisode(false);
+				}
 			}
 		}
-		else if ((menu_status == MENU_TYPE::ANIME_SELECTED) && (m_chapterNumber + 1 <= m_chapterMaxNumber))
+		else
 		{
-			m_chapterNumber += 1;
-			OtherEpisode(false);
+			if ((menu_status == MENU_TYPE::ANIME_SELECTED))
+			{
+				m_chapterNumber += 1;
+				OtherEpisode(false);
+			}
 		}
 	}
 
@@ -738,29 +752,28 @@ void GameScreen::CheckInputs()
 		}
 		else if (menu_status == MENU_TYPE::ANIME_SELECTED)
 		{
-			if (m_haveInternet)
-				menu_status = MENU_TYPE::LAST_ANIMES;
+			if (!m_fromSearching)
+			{
+				if (m_haveInternet)
+					menu_status = MENU_TYPE::LAST_ANIMES;
+				else
+					menu_status = MENU_TYPE::MAIN;
+			}
 			else
+			{
+				m_fromSearching = false;
 				menu_status = MENU_TYPE::MAIN;
+			}
 		}
 		else if (menu_status == MENU_TYPE::ANIME_READY_TO_WATCH)
 		{
-			if (m_haveInternet && !m_fromSearching)
-			{
-				menu_status = MENU_TYPE::ANIME_SELECTED;
-				m_fromSearching = false;
-				m_debugString = "";
-			}			
-			else
-			{
-				m_debugString = "";
-				m_fromSearching = false;
-				menu_status = MENU_TYPE::MAIN;
-			}	
+			m_debugString = "";
+			menu_status = MENU_TYPE::ANIME_SELECTED;
 		}
 		else if (menu_status == MENU_TYPE::SEARCHING)
 		{
 			m_debugString = "";
+			m_fromSearching = false;
 			menu_status = MENU_TYPE::MAIN;
 		}
 	}
@@ -771,7 +784,8 @@ void GameScreen::CheckInputs()
 		{
 			menu_status = MENU_TYPE::LAST_ANIMES;
 			m_fromSearching = false;
-
+			arrayselect = 0;
+			m_listOffset = 0;
 			if (!m_initializedList && m_haveInternet)
 			{
 				InitAnimeList();
@@ -823,12 +837,14 @@ void GameScreen::CheckInputs()
 	if (pressed & KEY_TOUCH)
 	{
 		hidTouchRead(&touch);
+		// Go Back - Anime List
 		if ((touch.px > 18 && touch.px < 300) && (touch.py > 36 && touch.py < 90))
 		{
 			if (menu_status == MENU_TYPE::MAIN)
 			{
 				menu_status = MENU_TYPE::LAST_ANIMES;
-
+				arrayselect = 0;
+				m_listOffset = 0;
 				if (!m_initializedList && m_haveInternet)
 				{
 					InitAnimeList();
@@ -836,12 +852,12 @@ void GameScreen::CheckInputs()
 			}
 			else if (menu_status == MENU_TYPE::LAST_ANIMES)
 			{
+				m_fromSearching = false;
 				menu_status = MENU_TYPE::MAIN;
-				m_fromSearching = true;
 			}
 			else if (menu_status == MENU_TYPE::ANIME_SELECTED)
 			{
-				m_fromSearching = true;
+				m_fromSearching = false;
 
 				if (m_haveInternet)
 					menu_status = MENU_TYPE::LAST_ANIMES;
@@ -850,6 +866,8 @@ void GameScreen::CheckInputs()
 			}
 			else if (menu_status == MENU_TYPE::SEARCHING)
 			{
+				m_fromSearching = true;
+
 				if (m_haveInternet)
 				{
 					didit = true;
@@ -877,10 +895,15 @@ void GameScreen::CheckInputs()
 			if ((menu_status == MENU_TYPE::MAIN) || (menu_status == MENU_TYPE::LAST_ANIMES) || (menu_status == MENU_TYPE::ANIME_SELECTED))
 			{
 				menu_status = MENU_TYPE::SEARCHING;
-				m_fromSearching = true;
+
+				if (!m_fromSearching)
+					m_fromSearching = true;
 			}
 			else if (menu_status == MENU_TYPE::SEARCHING)	// Search by URL
 			{
+				if (!m_fromSearching)
+					m_fromSearching = true;
+
 				if (m_haveInternet)
 				{
 					didit = true;
@@ -914,6 +937,9 @@ void GameScreen::CheckInputs()
 			}
 			else if (menu_status == MENU_TYPE::SEARCHING)
 			{
+				if (m_fromSearching)
+					m_fromSearching = false;
+
 				menu_status = MENU_TYPE::MAIN;
 			}
 			else
