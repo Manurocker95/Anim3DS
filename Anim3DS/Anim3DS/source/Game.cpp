@@ -196,6 +196,7 @@ void GameScreen::Start()
 	m_haveInternet = false;
 	m_initializedList = false;
 	m_goingOut = false;
+	m_fromSearching = false;
 	m_chapterMaxNumber = 1;
 	menu_status = GameScreen::MENU_TYPE::MAIN;
 
@@ -248,8 +249,6 @@ void GameScreen::InitAnimeList()
 		arraycount++;
 		val1++;
 	}
-
-	// arraychapter[arrayselect].substr(arraychapter[arrayselect].rfind("/") + 1)
 }
 
 void GameScreen::OtherEpisode(bool prev, bool go_to_one)
@@ -319,6 +318,8 @@ void GameScreen::OtherEpisode(bool prev, bool go_to_one)
 void GameScreen::SearchByName(std::string mybuf)
 {
 	std::string search_url = "http://animeflv.net/browse?q=" + mybuf;
+	replace(search_url.begin(), search_url.end(), ' ', '-'); 
+	
 
 	ret = http_download(search_url.c_str());
 
@@ -347,6 +348,8 @@ void GameScreen::SearchByName(std::string mybuf)
 			val1++;
 		}
 
+		m_debugString = gdrive;
+
 		Result ret2 = http_download(gdrive.c_str());
 
 		if (ret2 == 0)
@@ -373,18 +376,18 @@ void GameScreen::SearchByName(std::string mybuf)
 				arraycount++;
 				val1++;
 			}
-
+					
 			chapterSelected = gdrive;
-			val1 = content.find("ok.ru/videoembed/");
-			val2 = content.find('"', val1);
-			string gdrive = content.substr(val1, val2 - val1);
-			gdrive = "https://" + gdrive;
-			content = "";
-			chapterToShow = gdrive;
-			APT_PrepareToStartSystemApplet(APPID_WEB);
-			APT_StartSystemApplet(APPID_WEB, chapterToShow.c_str(), 1024, 0);
-			menu_status = MENU_TYPE::ANIME_READY_TO_WATCH;
+			menu_status = MENU_TYPE::ANIME_SELECTED;
 		}
+		else
+		{
+			m_debugString = "No se puede cargar la url del anime.";
+		}
+	}
+	else
+	{
+		m_debugString = "No se puede cargar: "+search_url;
 	}
 }
 
@@ -503,7 +506,6 @@ void GameScreen::Draw()
 			if (DEBUGMODE)
 			{
 				pp2d_draw_text(20, 135, 0.4f, 0.4f, C_SECOND_BLUE, chapterSelected.c_str());
-				pp2d_draw_text(20, 155, 0.6f, 0.6f, C_SECOND_BLUE, std::to_string(m_debugValue).c_str());
 			}
 			else
 			{
@@ -532,7 +534,7 @@ void GameScreen::Draw()
 			if (DEBUGMODE)
 			{
 				pp2d_draw_text(20, 135, 0.4f, 0.4f, C_SECOND_BLUE, chapterSelected.c_str());
-				pp2d_draw_text(20, 155, 0.6f, 0.6f, C_SECOND_BLUE, std::to_string(m_debugValue).c_str());
+				pp2d_draw_text(20, 155, 0.4f, 0.4f, C_SECOND_BLUE, m_debugString.c_str());
 			}
 			else
 			{
@@ -556,6 +558,9 @@ void GameScreen::Draw()
 		{
 			pp2d_draw_text(50, 75, 0.6f, 0.6f, C_SECOND_BLUE, "Introduce el nombre o URL del anime");
 			pp2d_draw_text(120, 95, 0.6f, 0.6f, C_SECOND_BLUE," que quieres ver.");
+
+			if (DEBUGMODE)
+				pp2d_draw_text(20, 155, 0.4f, 0.4f, C_SECOND_BLUE, m_debugString.c_str());
 		}
 		else
 		{
@@ -587,8 +592,16 @@ void GameScreen::Draw()
 	else
 	{
 		// VER ULTIMOS ANIMES
-		pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 18, 26, 0, 480, 283, 56);
-		pp2d_draw_text(60, 45, 0.7f, 0.7f, C_SECOND_BLUE, "VER ULTIMOS ANIMES");
+		if (menu_status == MENU_TYPE::LAST_ANIMES)
+		{
+			pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 18, 26, 0, 480, 283, 56);
+			pp2d_draw_text(135, 45, 0.7f, 0.7f, C_SECOND_BLUE, "INICIO");
+		}
+		else
+		{
+			pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 18, 26, 0, 480, 283, 56);
+			pp2d_draw_text(60, 45, 0.7f, 0.7f, C_SECOND_BLUE, "VER ULTIMOS ANIMES");
+		}
 
 		// BUSCAR ANIME
 		pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 18, 92, 0, 480, 283, 56);
@@ -713,13 +726,22 @@ void GameScreen::CheckInputs()
 		}
 		else if (menu_status == MENU_TYPE::ANIME_READY_TO_WATCH)
 		{
-			if (m_haveInternet)
+			if (m_haveInternet && !m_fromSearching)
+			{
 				menu_status = MENU_TYPE::ANIME_SELECTED;
+				m_fromSearching = false;
+				m_debugString = "";
+			}			
 			else
+			{
+				m_debugString = "";
+				m_fromSearching = false;
 				menu_status = MENU_TYPE::MAIN;
+			}	
 		}
 		else if (menu_status == MENU_TYPE::SEARCHING)
 		{
+			m_debugString = "";
 			menu_status = MENU_TYPE::MAIN;
 		}
 	}
@@ -792,6 +814,20 @@ void GameScreen::CheckInputs()
 					InitAnimeList();
 				}
 			}
+			else if (menu_status == MENU_TYPE::LAST_ANIMES)
+			{
+				menu_status = MENU_TYPE::MAIN;
+				m_fromSearching = true;
+			}
+			else if (menu_status == MENU_TYPE::ANIME_SELECTED)
+			{
+				m_fromSearching = true;
+
+				if (m_haveInternet)
+					menu_status = MENU_TYPE::LAST_ANIMES;
+				else
+					menu_status = MENU_TYPE::MAIN;
+			}
 			else if (menu_status == MENU_TYPE::SEARCHING)
 			{
 				if (m_haveInternet)
@@ -818,10 +854,10 @@ void GameScreen::CheckInputs()
 		// Searching Button
 		if ((touch.px > 18 && touch.px < 300) && (touch.py > 102 && touch.py < 156))
 		{
-
-			if (menu_status == MENU_TYPE::MAIN)
+			if ((menu_status == MENU_TYPE::MAIN) || (menu_status == MENU_TYPE::LAST_ANIMES) || (menu_status == MENU_TYPE::ANIME_SELECTED))
 			{
 				menu_status = MENU_TYPE::SEARCHING;
+				m_fromSearching = true;
 			}
 			else if (menu_status == MENU_TYPE::SEARCHING)	// Search by URL
 			{

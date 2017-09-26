@@ -21,6 +21,7 @@ Copyright (C) 2017 Manuel Rodríguez Matesanz
 
 /* Save Data */
 #define DATA_FILE "sdmc:/3ds/data/Anim3DS/data.sav"
+#define DATA_FILE2 "sdmc:/3ds/data/Anim3DS/data2.sav"
 
 /* Sounds */
 // Background Music

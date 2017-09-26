@@ -36,6 +36,7 @@ Copyright (C) 2017 Manuel Rodríguez Matesanz
 #include <3ds.h>
 #include <Vector>
 #include <cstddef>  
+#include <algorithm>
 #include "pp2d/pp2d.h"
 
 class GameScreen : public Scene
@@ -64,6 +65,7 @@ private:
 	std::string chapterSelected = "";
 	std::string chapterToShow = "";
 	std::vector<std::string> arraychapter;
+	std::string m_debugString = "";
 	int arrayselect;
 	int arraycount;
 	int off;
@@ -73,6 +75,7 @@ private:
 	bool m_haveInternet;
 	bool m_initializedList;
 	bool m_goingOut;
+	bool m_fromSearching;
 	int m_chapterNumber;
 	int m_chapterMaxNumber;
 	int m_debugValue;

@@ -13,6 +13,12 @@ What does this have that the original doesn't?
 - You can select an anime and select a previous episode
 - You can save your watched animes and set favs.
 
+Instructions:
+
+- Install .cia
+- Reboot your system
+- Run Anim3DS
+
 Credits:
 
     - Smealum & Yellows8: Scene3DS and stuff, you know.
