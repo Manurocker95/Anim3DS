@@ -44,28 +44,38 @@ class GameScreen : public Scene
 
 public:
 
-	enum MENU_TYPE { MAIN, LAST_ANIMES, ANIME_SELECTED, ANIME_READY_TO_WATCH, SEARCHING };
+	enum MENU_TYPE 
+	{ 
+		MAIN,					// Main menú (Banner + 3 options)
+		LAST_ANIMES,			// List of latest animes
+		ANIME_SELECTED,			// Choosing an anime (You can d-pad up and down for changing the episode)
+		ANIME_READY_TO_WATCH,	// Just press A for watching the anime
+		SEARCHING,				// Search menu (By name and by url)
+		SELECTING_SEARCH,		// Choose by 3 best searched animes
+		FAVOURITES				// Choose from favourites
+	};
 
 public:
 
-	GameScreen();				// Constructor
-	~GameScreen();				// Destructor
-	void Start();				// initialize
-	void Draw();				// Draw
-	void CheckInputs();			// CheckInput
-	void Update();				// Update
+	GameScreen(std::string * last);				// Constructor
+	~GameScreen();								// Destructor
+	void Start(std::string * last);				// initialize
+	void Draw();								// Draw
+	void CheckInputs();							// CheckInput
+	void Update();								// Update
 
 private:
 
 	float m_offset;						// Offset for 3D
 	float m_listOffset;
 	Result m_internetServiceInitialized;
-	sound * m_bgm, *m_sfx;			// Sounds
-	std::string content = "";
-	std::string chapterSelected = "";
+	sound * m_bgm, *m_sfx;				// Sounds
+	std::string content = "";			// URL stuff
+	std::string chapterSelected = "";	
 	std::string chapterToShow = "";
 	std::vector<std::string> arraychapter;
 	std::string m_debugString = "";
+	std::string * m_lastWatched;
 	int arrayselect;
 	int arraycount;
 	int off;
@@ -88,6 +98,7 @@ private:
 	void OtherEpisode(bool prev, bool go_to_one = false);
 	void SearchByName(std::string mybuf);
 	void SearchByURL(std::string mybuf);
+	void SearchLastWatched(std::string mybuf);
 };
 
 #endif

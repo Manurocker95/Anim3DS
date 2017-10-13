@@ -171,11 +171,12 @@ Result GameScreen::http_download(const char *url)
 	return 0;
 }
 
-GameScreen::GameScreen() : Scene ()
+GameScreen::GameScreen(std::string * last) : Scene()
 {
 	// we initialize data
-	Start();
+	Start(last);
 }
+
 
 GameScreen::~GameScreen()
 {
@@ -184,7 +185,7 @@ GameScreen::~GameScreen()
 	pp2d_free_texture(TEXTURE_SPRITESHEET2);
 }
 
-void GameScreen::Start()
+void GameScreen::Start(std::string * last)
 {
 
 	// We initialize our game variables
@@ -198,6 +199,7 @@ void GameScreen::Start()
 	m_goingOut = false;
 	m_fromSearching = false;
 	m_chapterMaxNumber = 1;
+	m_lastWatched = last;
 	menu_status = GameScreen::MENU_TYPE::MAIN;
 
 	// We load our images and place them into RAM so they can be painted
@@ -218,6 +220,17 @@ void GameScreen::InitializeViewer()
 	{
 		m_haveInternet = true;
 		InitAnimeList();
+
+		if (m_lastWatched->compare("") != 0)
+		{
+			ret = http_download(m_lastWatched->c_str());
+			// if we can't access last watched, we delete that reference
+			if (ret != 0)
+			{
+				*m_lastWatched = "";
+				SceneManager::instance()->SaveData();
+			}
+		}
 	}
 }
 
@@ -326,7 +339,6 @@ void GameScreen::SearchByName(std::string mybuf)
 	std::string search_url = "http://animeflv.net/browse?q=" + mybuf;
 	replace(search_url.begin(), search_url.end(), ' ', '-'); 
 	
-
 	ret = http_download(search_url.c_str());
 
 	if (ret == 0)
@@ -399,20 +411,32 @@ void GameScreen::SearchByName(std::string mybuf)
 
 void GameScreen::SearchByURL(std::string mybuf)
 {
-	ret = http_download(mybuf.c_str());
+	std::string url = "http://animeflv.net/ver/" + mybuf;
+
+	ret = http_download(url.c_str());
 
 	if (ret == 0)
 	{
+		m_fromSearching = true;
 		chapterSelected = mybuf;
+		*m_lastWatched = chapterSelected;
 		int val1 = content.find("ok.ru/videoembed/");
 		int val2 = content.find('"', val1);
 		string gdrive = content.substr(val1, val2 - val1);
 		gdrive = "https://" + gdrive;
 		content = "";
 		chapterToShow = gdrive;
+		std::size_t found = chapterSelected.find_last_of("-");
+		m_chapterNumber = std::stoi(chapterSelected.substr(found + 1));
 		APT_PrepareToStartSystemApplet(APPID_WEB);
 		APT_StartSystemApplet(APPID_WEB, chapterToShow.c_str(), 1024, 0);
 		menu_status = MENU_TYPE::ANIME_READY_TO_WATCH;
+	}
+	else
+	{
+		chapterSelected = "";
+		m_chapterNumber = 1;
+		menu_status = MENU_TYPE::SEARCHING;
 	}
 }
 
@@ -469,7 +493,14 @@ void GameScreen::Draw()
 		pp2d_draw_texture_part(TEXTURE_SPRITESHEET2, 75, 60, 0, 664, 256, 128);
 		pp2d_draw_text(140, 6, 0.4f, 0.4f, C_WHITE, "Manurocker95 (C) 2017");
 		pp2d_draw_rectangle(0, 217, 400, 23, C_SECOND_BLUE);
-		pp2d_draw_text(130, 221, 0.5f, 0.5f, C_WHITE, "Selecciona una opcion");
+		pp2d_draw_text(140, 223, 0.4f, 0.4f, C_WHITE, "Selecciona una opcion");
+		
+		if (m_lastWatched->compare("") != 0)
+		{
+			pp2d_draw_wtext(7, 221, 0.5f, 0.5f, C_WHITE, L"\uE004 Ultimo visto");
+			//pp2d_draw_wtext(312, 221, 0.5f, 0.5f, C_WHITE, L"\uE005 Favoritos");
+		}
+
 		break;
 	case MENU_TYPE::LAST_ANIMES:
 		if (m_initializedList && m_haveInternet)
@@ -640,6 +671,24 @@ void GameScreen::Update()
 
 }
 
+void GameScreen::SearchLastWatched(std::string mybuf)
+{
+	ret = http_download(mybuf.c_str());
+
+	if (ret == 0)
+	{
+		menu_status = MENU_TYPE::ANIME_SELECTED;
+		chapterSelected = mybuf;
+		std::size_t found = chapterSelected.find_last_of("-");
+		m_chapterNumber = std::stoi(chapterSelected.substr(found + 1));
+	}
+	else
+	{
+		chapterSelected = "";
+		*m_lastWatched = "";
+	}
+}
+
 void GameScreen::CheckInputs()
 {
 	static SwkbdState swkbd;
@@ -694,6 +743,19 @@ void GameScreen::CheckInputs()
 			{
 				m_chapterNumber -= 1;
 				OtherEpisode(true);
+			}
+		}
+	}
+
+	if (m_haveInternet && (pressed & KEY_L))
+	{
+		if (menu_status == MENU_TYPE::MAIN)
+		{
+			// There's a last watched episode saved in file
+			if (m_lastWatched->compare("") != 0)
+			{
+				m_fromSearching = true;
+				SearchLastWatched(*m_lastWatched);
 			}
 		}
 	}
@@ -827,6 +889,11 @@ void GameScreen::CheckInputs()
 		{
 			if (m_haveInternet)
 			{
+				if (chapterSelected.compare("") != 0)
+				{
+					*m_lastWatched = chapterSelected;
+				}
+
 				//APT_PrepareToStartSystemApplet(APPID_WEB);
 				//APT_StartSystemApplet(APPID_WEB, chapterToShow.c_str(), 1024, 0);
 				m_goingOut = true;

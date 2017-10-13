@@ -41,13 +41,13 @@ public:
 	void exitGame();						// Method to exit the game (Out = true)
 	void ReadData();						// Method for reading data from our save
 	void SaveDataAndExit();					// Method that saves our data to the .sav and exits
-
+	void SaveData();						// Method that saves our data to the .sav
 private:
 
 	SceneManager() {};  // Private so that it can  not be called
 	static SceneManager* Instance;	// Singleton Instance
 
-	std::string m_watchedAnimes;					// Variable saved in our .sav
+	std::string m_lastWatched;						// Variable saved in our .sav
 	bool m_out;										// if we ended or not the program
 	Scene* m_actualScene;							// Scene running
 };
